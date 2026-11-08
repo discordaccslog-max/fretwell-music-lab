@@ -1,0 +1,305 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Fretwell Music Lab — Interactive music theory &amp; ear training</title>
+<meta name="description" content="Interactive music theory and ear-training tools for guitar and piano players: notes, intervals, scales, chords, rhythm and harmony, in the browser with synthesized sound.">
+<link rel="canonical" href="https://discordaccslog-max.github.io/fretwell-music-lab/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Fretwell Music Lab">
+<meta property="og:title" content="Fretwell Music Lab — Interactive music theory &amp; ear training">
+<meta property="og:description" content="Interactive music theory and ear-training tools for guitar and piano players: notes, intervals, scales, chords, rhythm and harmony, in the browser with synthesized sound.">
+<meta property="og:url" content="https://discordaccslog-max.github.io/fretwell-music-lab/">
+<meta property="og:image" content="https://discordaccslog-max.github.io/fretwell-music-lab/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Fretwell Music Lab: geometric shapes arranged like a keyboard, a fretboard and a musical staff">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#F2EDE3" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0F0F0E" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="./favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="./icons/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,500..900&family=IBM+Plex+Mono:wght@500;600&family=Instrument+Sans:wght@400..700&display=swap">
+<link rel="stylesheet" href="./css/site.css">
+<script>(function(){try{var d=document.documentElement,t=localStorage.getItem('fretwell.theme');if(t==='dark'||t==='light')d.setAttribute('data-theme',t);if(localStorage.getItem('fretwell.large')==='1')d.classList.add('is-large');}catch(e){}})();</script>
+<script type="module" src="./js/site.js"></script>
+<script type="module" src="./js/pages/home.js"></script>
+</head>
+<body class="page-home">
+<a class="skip-link" href="#main">Skip to content</a>
+<header class="site-header">
+  <div class="wrap header-inner">
+    <a class="brand" href="./"><svg class="logo" viewBox="0 0 32 32" aria-hidden="true" focusable="false"><rect width="32" height="32" fill="currentColor"/><g fill="var(--bg)"><rect x="5" y="9" width="22" height="1.6"/><rect x="5" y="13" width="22" height="1.6"/><rect x="5" y="17" width="22" height="1.6"/><rect x="5" y="21" width="22" height="1.6"/><rect x="5" y="25" width="22" height="1.6"/></g><circle cx="20" cy="17.8" r="5" fill="var(--vermilion)"/></svg><span class="brand-name">Fretwell<br>Music Lab</span></a>
+    <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav"><span class="nav-toggle-bars" aria-hidden="true"></span>Menu</button>
+    <nav id="site-nav" class="site-nav" aria-label="Main">
+      <ul>
+        <li><a href="./#foundations">Foundations</a></li>
+        <li><a href="./#studio">Studio Editions</a></li>
+        <li><a href="./about/">About</a></li>
+        <li><a href="./faq/">FAQ</a></li>
+        <li class="nav-room" hidden><a href="./practice/">Practice room</a></li>
+        <li><a class="nav-key" href="./unlock/">Have a key?</a></li>
+      </ul>
+    </nav>
+    <button class="theme-toggle" type="button" aria-label="Switch to dark mode"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2.2"/><path d="M12 3a9 9 0 0 1 0 18z" fill="currentColor"/></svg></button>
+  </div>
+</header>
+<main id="main">
+
+<section class="hero" aria-labelledby="hero-title">
+  <div class="wrap hero-grid">
+    <div class="hero-copy">
+      <p class="eyebrow">Theory &amp; ear training for guitar and piano</p>
+      <h1 id="hero-title" class="display">Hear it.<br>Read it.<br><span class="display-accent">Play it.</span></h1>
+      <p class="lede">Interactive tools for notes, intervals, scales, chords, rhythm and harmony. Every sound is synthesized in your browser and every exercise is generated fresh. No account, no downloads.</p>
+      <div class="hero-actions">
+        <a class="btn btn-ink" href="#foundations">See the tools</a>
+        <a class="btn btn-outline" href="#mini-quiz">Try the free quiz</a>
+      </div>
+    </div>
+    <div class="hero-play" id="hero-play">
+      <div class="hero-controls">
+        <button class="sound-toggle" type="button" aria-pressed="false" data-sound-toggle><span class="sound-icon" aria-hidden="true"></span><span class="sound-label">Turn sound on</span></button>
+        <label class="volume" hidden><span>Volume</span><input type="range" min="0" max="100" step="1" data-volume aria-label="Volume"></label>
+      </div>
+      <div class="hero-board">
+  <div class="hk-keys" role="group" aria-label="Keyboard shapes">
+    <button type="button" class="hk hk-white" style="--col:0" data-midi="60" data-inst="keys" data-name="C4" aria-label="Play C4 on the keyboard"></button><button type="button" class="hk hk-white" style="--col:1" data-midi="62" data-inst="keys" data-name="D4" aria-label="Play D4 on the keyboard"></button><button type="button" class="hk hk-white hk--saffron" style="--col:2" data-midi="64" data-inst="keys" data-name="E4" aria-label="Play E4 on the keyboard"></button><button type="button" class="hk hk-white" style="--col:3" data-midi="65" data-inst="keys" data-name="F4" aria-label="Play F4 on the keyboard"></button><button type="button" class="hk hk-white" style="--col:4" data-midi="67" data-inst="keys" data-name="G4" aria-label="Play G4 on the keyboard"></button><button type="button" class="hk hk-white hk--cobalt" style="--col:5" data-midi="69" data-inst="keys" data-name="A4" aria-label="Play A4 on the keyboard"></button><button type="button" class="hk hk-white" style="--col:6" data-midi="71" data-inst="keys" data-name="B4" aria-label="Play B4 on the keyboard"></button><button type="button" class="hk hk-white hk--vermilion" style="--col:7" data-midi="72" data-inst="keys" data-name="C5" aria-label="Play C5 on the keyboard"></button><button type="button" class="hk hk-white" style="--col:8" data-midi="74" data-inst="keys" data-name="D5" aria-label="Play D5 on the keyboard"></button><button type="button" class="hk hk-white" style="--col:9" data-midi="76" data-inst="keys" data-name="E5" aria-label="Play E5 on the keyboard"></button>
+    <button type="button" class="hk hk-black" style="--pos:1" data-midi="61" data-inst="keys" data-name="C♯4" aria-label="Play C♯4 on the keyboard"></button><button type="button" class="hk hk-black" style="--pos:2" data-midi="63" data-inst="keys" data-name="E♭4" aria-label="Play E♭4 on the keyboard"></button><button type="button" class="hk hk-black" style="--pos:4" data-midi="66" data-inst="keys" data-name="F♯4" aria-label="Play F♯4 on the keyboard"></button><button type="button" class="hk hk-black" style="--pos:5" data-midi="68" data-inst="keys" data-name="A♭4" aria-label="Play A♭4 on the keyboard"></button><button type="button" class="hk hk-black" style="--pos:6" data-midi="70" data-inst="keys" data-name="B♭4" aria-label="Play B♭4 on the keyboard"></button><button type="button" class="hk hk-black" style="--pos:8" data-midi="73" data-inst="keys" data-name="C♯5" aria-label="Play C♯5 on the keyboard"></button><button type="button" class="hk hk-black" style="--pos:9" data-midi="75" data-inst="keys" data-name="E♭5" aria-label="Play E♭5 on the keyboard"></button>
+  </div>
+  <div class="hf-board" role="group" aria-label="Fretboard shapes">
+    <span class="hf-string" style="--row:0" aria-hidden="true"></span><span class="hf-string" style="--row:1" aria-hidden="true"></span><span class="hf-string" style="--row:2" aria-hidden="true"></span><span class="hf-string" style="--row:3" aria-hidden="true"></span>
+    <span class="hf-fret" style="--colx:1" aria-hidden="true"></span><span class="hf-fret" style="--colx:2" aria-hidden="true"></span><span class="hf-fret" style="--colx:3" aria-hidden="true"></span>
+    <button type="button" class="hf-dot hf--vermilion" style="--row:0;--colx:0" data-midi="69" data-inst="guitar" data-name="A4" aria-label="Play A4 on the fretboard"></button><button type="button" class="hf-dot hf--ink" style="--row:0;--colx:3" data-midi="72" data-inst="guitar" data-name="C5" aria-label="Play C5 on the fretboard"></button><button type="button" class="hf-dot hf--ink" style="--row:1;--colx:0" data-midi="64" data-inst="guitar" data-name="E4" aria-label="Play E4 on the fretboard"></button><button type="button" class="hf-dot hf--cobalt" style="--row:1;--colx:3" data-midi="67" data-inst="guitar" data-name="G4" aria-label="Play G4 on the fretboard"></button><button type="button" class="hf-dot hf--saffron" style="--row:2;--colx:0" data-midi="60" data-inst="guitar" data-name="C4" aria-label="Play C4 on the fretboard"></button><button type="button" class="hf-dot hf--ink" style="--row:2;--colx:2" data-midi="62" data-inst="guitar" data-name="D4" aria-label="Play D4 on the fretboard"></button><button type="button" class="hf-dot hf--ink" style="--row:3;--colx:0" data-midi="55" data-inst="guitar" data-name="G3" aria-label="Play G3 on the fretboard"></button><button type="button" class="hf-dot hf--vermilion" style="--row:3;--colx:2" data-midi="57" data-inst="guitar" data-name="A3" aria-label="Play A3 on the fretboard"></button>
+  </div>
+</div>
+      <div class="hero-staff" aria-hidden="true"><svg class="hero-staff-svg" viewBox="0 0 600 120" preserveAspectRatio="none"><g class="hs-lines"><rect x="0" y="30" width="600" height="2"/><rect x="0" y="44" width="600" height="2"/><rect x="0" y="58" width="600" height="2"/><rect x="0" y="72" width="600" height="2"/><rect x="0" y="86" width="600" height="2"/></g></svg><div class="hero-staff-notes"></div></div>
+      <p class="hero-hint">Press the shapes to play. Notes appear on the staff. <span class="hero-volnote">Start at a low volume, especially with headphones.</span></p>
+    </div>
+  </div>
+</section>
+
+<section class="section quiz-section" id="mini-quiz" aria-labelledby="quiz-title">
+  <div class="wrap quiz-grid">
+    <div class="quiz-intro">
+      <p class="eyebrow">Free · not part of any paid tool</p>
+      <h2 id="quiz-title" class="h-staff">Mini interval quiz</h2>
+      <p>Five rounds. Two notes play one after the other. Is the gap a 3rd, a 5th or an octave? It is a quick taste of ear training, separate from the paid tools.</p>
+      <p class="small">Requires sound. Start at a low volume, especially with headphones.</p>
+    </div>
+    <div class="mini-quiz" id="mini-quiz-app" aria-live="polite">
+      <noscript><p>The mini quiz needs JavaScript turned on.</p></noscript>
+    </div>
+  </div>
+</section>
+
+<section class="section tier" id="foundations" aria-labelledby="found-title">
+  <div class="wrap">
+    <header class="tier-head">
+      <p class="tier-label">Tier one</p>
+      <h2 id="found-title" class="tier-title">Foundations</h2>
+      <p class="tier-text">Five focused tools for the essentials of musicianship. Each one is sold on its own, or get all five with one key.</p>
+    </header>
+    <div class="staff-rule" aria-hidden="true"></div>
+    <div class="tiles">
+      <a class="tile tile--saffron" href="./products/note-reader/">
+  <div class="tile-art"><svg class="art art-note" viewBox="0 0 240 240" aria-hidden="true" focusable="false"><rect x="18" y="67.5" width="204" height="5" fill="currentColor"/><rect x="18" y="87.5" width="204" height="5" fill="currentColor"/><rect x="18" y="107.5" width="204" height="5" fill="currentColor"/><rect x="18" y="127.5" width="204" height="5" fill="currentColor"/><rect x="18" y="147.5" width="204" height="5" fill="currentColor"/>
+        <g class="a-move a-1"><rect x="150" y="160" width="44" height="5" fill="currentColor"/><circle cx="172" cy="162" r="17" fill="currentColor"/></g>
+        <g class="a-move a-2"><circle cx="112" cy="110" r="22" fill="var(--a1)"/></g>
+        <g class="a-move a-3"><rect x="52" y="34" width="14" height="172" fill="currentColor"/></g></svg></div>
+  <div class="tile-body">
+    <p class="tile-tier">Foundations</p>
+    <h3 class="tile-title">Note Reader</h3>
+    <p class="tile-text">Name notes on the staff, the fretboard and the keyboard until reading them is automatic.</p>
+    <p class="tile-price"><span data-price-for="note-reader">$10</span></p>
+  </div>
+</a>
+<a class="tile tile--vermilion" href="./products/interval-trainer/">
+  <div class="tile-art"><svg class="art art-interval" viewBox="0 0 240 240" aria-hidden="true" focusable="false"><rect x="20" y="196" width="200" height="6" fill="currentColor"/>
+        <path class="a-arc" d="M62 176 C 70 70, 170 40, 180 92" fill="none" stroke="currentColor" stroke-width="11" stroke-linecap="round"/>
+        <g class="a-move a-1"><circle cx="62" cy="176" r="24" fill="currentColor"/></g>
+        <g class="a-move a-2"><circle cx="180" cy="92" r="24" fill="var(--a1)"/></g></svg></div>
+  <div class="tile-body">
+    <p class="tile-tier">Foundations</p>
+    <h3 class="tile-title">Interval Ear Trainer</h3>
+    <p class="tile-text">Hear the distance between two notes and name it — ascending, descending or together.</p>
+    <p class="tile-price"><span data-price-for="interval-trainer">$14</span></p>
+  </div>
+</a>
+<a class="tile tile--cobalt" href="./products/scale-explorer/">
+  <div class="tile-art"><svg class="art art-scale" viewBox="0 0 240 240" aria-hidden="true" focusable="false"><rect x="20" y="210" width="200" height="5" fill="currentColor"/><rect class="a-step" style="--i:0" x="20" y="180" width="26" height="26" fill="var(--a1)"/><rect class="a-step" style="--i:1" x="49" y="158" width="26" height="26" fill="currentColor"/><rect class="a-step" style="--i:2" x="78" y="136" width="26" height="26" fill="currentColor"/><rect class="a-step" style="--i:3" x="107" y="114" width="26" height="26" fill="currentColor"/><rect class="a-step" style="--i:4" x="136" y="92" width="26" height="26" fill="currentColor"/><rect class="a-step" style="--i:5" x="165" y="70" width="26" height="26" fill="currentColor"/><rect class="a-step" style="--i:6" x="194" y="48" width="26" height="26" fill="var(--a1)"/></svg></div>
+  <div class="tile-body">
+    <p class="tile-tier">Foundations</p>
+    <h3 class="tile-title">Scale &amp; Mode Explorer</h3>
+    <p class="tile-text">Every major, minor, pentatonic, blues and modal scale in every key — seen, heard and built from memory.</p>
+    <p class="tile-price"><span data-price-for="scale-explorer">$16</span></p>
+  </div>
+</a>
+<a class="tile tile--ink" href="./products/chord-builder/">
+  <div class="tile-art"><svg class="art art-chord" viewBox="0 0 240 240" aria-hidden="true" focusable="false">
+        <rect class="a-bar" style="--i:0" x="40" y="160" width="150" height="26" fill="currentColor"/>
+        <rect class="a-bar" style="--i:1" x="70" y="120" width="130" height="26" fill="var(--a1)"/>
+        <rect class="a-bar" style="--i:2" x="30" y="80" width="120" height="26" fill="currentColor"/>
+        <rect class="a-bar" style="--i:3" x="90" y="40" width="110" height="26" fill="var(--a2)"/></svg></div>
+  <div class="tile-body">
+    <p class="tile-tier">Foundations</p>
+    <h3 class="tile-title">Chord Builder</h3>
+    <p class="tile-text">Build triads and seventh chords in every inversion, then learn to hear their quality and bass note.</p>
+    <p class="tile-price"><span data-price-for="chord-builder">$19</span></p>
+  </div>
+</a>
+<a class="tile tile--paper" href="./products/rhythm-lab/">
+  <div class="tile-art"><svg class="art art-rhythm" viewBox="0 0 240 240" aria-hidden="true" focusable="false"><circle class="a-pulse" style="--i:0" cx="48" cy="48" r="17" fill="var(--a1)" stroke="currentColor" stroke-width="0"/><circle class="" style="--i:1" cx="96" cy="48" r="15" fill="none" stroke="currentColor" stroke-width="4"/><circle class="" style="--i:2" cx="144" cy="48" r="15" fill="none" stroke="currentColor" stroke-width="4"/><circle class="a-pulse" style="--i:3" cx="192" cy="48" r="17" fill="currentColor" stroke="currentColor" stroke-width="0"/><circle class="" style="--i:4" cx="48" cy="96" r="15" fill="none" stroke="currentColor" stroke-width="4"/><circle class="" style="--i:5" cx="96" cy="96" r="15" fill="none" stroke="currentColor" stroke-width="4"/><circle class="a-pulse" style="--i:6" cx="144" cy="96" r="17" fill="currentColor" stroke="currentColor" stroke-width="0"/><circle class="" style="--i:7" cx="192" cy="96" r="15" fill="none" stroke="currentColor" stroke-width="4"/><circle class="a-pulse" style="--i:8" cx="48" cy="144" r="17" fill="currentColor" stroke="currentColor" stroke-width="0"/><circle class="" style="--i:9" cx="96" cy="144" r="15" fill="none" stroke="currentColor" stroke-width="4"/><circle class="a-pulse" style="--i:10" cx="144" cy="144" r="17" fill="var(--a1)" stroke="currentColor" stroke-width="0"/><circle class="" style="--i:11" cx="192" cy="144" r="15" fill="none" stroke="currentColor" stroke-width="4"/><circle class="a-pulse" style="--i:12" cx="48" cy="192" r="17" fill="currentColor" stroke="currentColor" stroke-width="0"/><circle class="a-pulse" style="--i:13" cx="96" cy="192" r="17" fill="currentColor" stroke="currentColor" stroke-width="0"/><circle class="" style="--i:14" cx="144" cy="192" r="15" fill="none" stroke="currentColor" stroke-width="4"/><circle class="a-pulse" style="--i:15" cx="192" cy="192" r="17" fill="var(--a1)" stroke="currentColor" stroke-width="0"/></svg></div>
+  <div class="tile-body">
+    <p class="tile-tier">Foundations</p>
+    <h3 class="tile-title">Rhythm Lab</h3>
+    <p class="tile-text">Read and tap rhythms against a metronome, with timing feedback on every single tap.</p>
+    <p class="tile-price"><span data-price-for="rhythm-lab">$22</span></p>
+  </div>
+</a>
+      <a class="tile tile--bundle" href="./products/foundations-bundle/">
+        <div class="tile-art"><svg class="art art-bundle" viewBox="0 0 380 110" aria-hidden="true" focusable="false">
+        <g class="a-move a-1"><rect x="10" y="40" width="70" height="5" fill="currentColor"/><rect x="10" y="55" width="70" height="5" fill="currentColor"/><rect x="10" y="70" width="70" height="5" fill="currentColor"/><circle cx="48" cy="57" r="11" fill="var(--a1)"/></g>
+        <g class="a-move a-2"><path d="M104 72 C110 32, 150 26, 160 46" fill="none" stroke="currentColor" stroke-width="7" stroke-linecap="round"/><circle cx="104" cy="72" r="11" fill="currentColor"/><circle cx="160" cy="46" r="11" fill="var(--a2)"/></g>
+        <g class="a-move a-3"><rect x="190" y="70" width="14" height="14" fill="currentColor"/><rect x="206" y="56" width="14" height="14" fill="currentColor"/><rect x="222" y="42" width="14" height="14" fill="var(--a1)"/></g>
+        <g class="a-move a-4"><rect x="250" y="66" width="60" height="12" fill="currentColor"/><rect x="262" y="50" width="56" height="12" fill="var(--a2)"/><rect x="246" y="34" width="50" height="12" fill="currentColor"/></g>
+        <g class="a-move a-5"><circle cx="342" cy="40" r="7" fill="currentColor"/><circle cx="364" cy="40" r="7" fill="none" stroke="currentColor" stroke-width="3"/><circle cx="342" cy="64" r="7" fill="none" stroke="currentColor" stroke-width="3"/><circle cx="364" cy="64" r="7" fill="var(--a1)"/></g></svg></div>
+        <div class="tile-body">
+          <p class="tile-tier">Foundations</p>
+          <h3 class="tile-title">Foundations Bundle</h3>
+          <p class="tile-text">All five Foundations tools, unlocked by a single key.</p>
+          <p class="tile-price"><span data-price-for="foundations-bundle">$49</span></p>
+        </div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<section class="studio" id="studio" aria-labelledby="studio-title">
+  <div class="wrap">
+    <header class="tier-head tier-head--studio">
+      <p class="tier-label">Tier two</p>
+      <h2 id="studio-title" class="tier-title">Studio Editions</h2>
+      <p class="tier-text">Advanced tools with harder material, written exercises checked against rules, and multi-voice dictation.</p>
+    </header>
+    <div class="staff-rule staff-rule--light" aria-hidden="true"></div>
+    <div class="studio-grid">
+      <a class="tile tile--atelier tile--large" href="./products/atelier/">
+  <div class="tile-art"><svg class="art art-atelier" viewBox="0 0 240 250" aria-hidden="true" focusable="false">
+        <g class="a-rings"><circle cx="160" cy="80" r="62" fill="none" stroke="var(--a2)" stroke-width="10"/><circle cx="160" cy="80" r="38" fill="none" stroke="currentColor" stroke-width="6"/><circle cx="160" cy="80" r="14" fill="var(--a1)"/></g>
+        <polyline class="a-voice" points="20,190 52,170 84,182 116,150 148,160 180,130 212,140" fill="none" stroke="currentColor" stroke-width="7" stroke-linejoin="round"/>
+        <polyline class="a-voice a-voice-2" points="20,226 52,214 84,230 116,206 148,218 180,196 212,206" fill="none" stroke="var(--a3)" stroke-width="7" stroke-linejoin="round"/>
+        <rect x="20" y="30" width="10" height="30" fill="currentColor"/><rect x="34" y="40" width="10" height="20" fill="currentColor"/><rect x="48" y="30" width="10" height="30" fill="currentColor"/><rect x="62" y="40" width="10" height="20" fill="currentColor"/><rect x="76" y="30" width="10" height="30" fill="currentColor"/><rect x="90" y="40" width="10" height="20" fill="currentColor"/><rect x="104" y="40" width="10" height="20" fill="currentColor"/></svg></div>
+  <div class="tile-body">
+    <p class="tile-tier">Studio Edition</p>
+    <h3 class="tile-title">Atelier Edition</h3>
+    <p class="tile-text">The most demanding training in the catalogue: compound intervals, seventh-chord inversions, applied dominants, modulations, two-voice and rhythmic dictation.</p>
+    <p class="tile-price"><span data-price-for="atelier">$75</span></p>
+  </div>
+</a>
+      <a class="tile tile--cobalt" href="./products/progression-lab/">
+  <div class="tile-art"><svg class="art art-progression" viewBox="0 0 240 240" aria-hidden="true" focusable="false"><rect class="a-col" style="--i:0" x="30" y="51" width="24" height="18" fill="currentColor"/><rect class="a-col" style="--i:0" x="30" y="91" width="24" height="18" fill="currentColor"/><rect class="a-col" style="--i:0" x="30" y="121" width="24" height="18" fill="currentColor"/><rect class="a-col" style="--i:0" x="30" y="171" width="24" height="18" fill="var(--a1)"/><rect class="a-col" style="--i:1" x="82" y="41" width="24" height="18" fill="currentColor"/><rect class="a-col" style="--i:1" x="82" y="86" width="24" height="18" fill="currentColor"/><rect class="a-col" style="--i:1" x="82" y="131" width="24" height="18" fill="currentColor"/><rect class="a-col" style="--i:1" x="82" y="161" width="24" height="18" fill="var(--a1)"/><rect class="a-col" style="--i:2" x="134" y="31" width="24" height="18" fill="currentColor"/><rect class="a-col" style="--i:2" x="134" y="81" width="24" height="18" fill="currentColor"/><rect class="a-col" style="--i:2" x="134" y="111" width="24" height="18" fill="currentColor"/><rect class="a-col" style="--i:2" x="134" y="176" width="24" height="18" fill="var(--a1)"/><rect class="a-col" style="--i:3" x="186" y="51" width="24" height="18" fill="currentColor"/><rect class="a-col" style="--i:3" x="186" y="91" width="24" height="18" fill="currentColor"/><rect class="a-col" style="--i:3" x="186" y="121" width="24" height="18" fill="currentColor"/><rect class="a-col" style="--i:3" x="186" y="171" width="24" height="18" fill="var(--a1)"/><polyline points="42,60 94,50 146,40 198,60" fill="none" stroke="currentColor" stroke-width="3" opacity=".55"/><polyline points="42,100 94,95 146,90 198,100" fill="none" stroke="currentColor" stroke-width="3" opacity=".55"/><polyline points="42,130 94,140 146,120 198,130" fill="none" stroke="currentColor" stroke-width="3" opacity=".55"/><polyline points="42,180 94,170 146,185 198,180" fill="none" stroke="currentColor" stroke-width="3" opacity=".55"/></svg></div>
+  <div class="tile-body">
+    <p class="tile-tier">Studio Edition</p>
+    <h3 class="tile-title">Progression Lab</h3>
+    <p class="tile-text">Roman numeral analysis, common progressions in every key, progression ear training and four-part writing checked against the rules.</p>
+    <p class="tile-price"><span data-price-for="progression-lab">$35</span></p>
+  </div>
+</a>
+<a class="tile tile--saffron" href="./products/jazz-harmony/">
+  <div class="tile-art"><svg class="art art-jazz" viewBox="0 0 240 240" aria-hidden="true" focusable="false">
+        <rect class="a-bar" style="--i:0" x="40" y="190" width="150" height="18" fill="currentColor"/><rect class="a-bar" style="--i:1" x="74" y="162" width="128" height="18" fill="currentColor"/><rect class="a-bar" style="--i:2" x="40" y="134" width="106" height="18" fill="var(--a2)"/><rect class="a-bar" style="--i:3" x="74" y="106" width="150" height="18" fill="currentColor"/><rect class="a-bar" style="--i:4" x="40" y="78" width="128" height="18" fill="var(--a1)"/><rect class="a-bar" style="--i:5" x="74" y="50" width="106" height="18" fill="currentColor"/>
+        <rect class="a-slash" x="170" y="20" width="14" height="200" fill="currentColor" transform="rotate(18 177 120)"/></svg></div>
+  <div class="tile-body">
+    <p class="tile-tier">Studio Edition</p>
+    <h3 class="tile-title">Jazz Harmony Studio</h3>
+    <p class="tile-text">Extended and altered chords, ii–V–I in all twelve keys, voicings on keyboard and guitar, and ear training for extensions.</p>
+    <p class="tile-price"><span data-price-for="jazz-harmony">$45</span></p>
+  </div>
+</a>
+<a class="tile tile--vermilion" href="./products/melodic-dictation/">
+  <div class="tile-art"><svg class="art art-melody" viewBox="0 0 240 240" aria-hidden="true" focusable="false"><rect x="14" y="78.5" width="212" height="3" fill="currentColor" opacity=".6"/><rect x="14" y="98.5" width="212" height="3" fill="currentColor" opacity=".6"/><rect x="14" y="118.5" width="212" height="3" fill="currentColor" opacity=".6"/><rect x="14" y="138.5" width="212" height="3" fill="currentColor" opacity=".6"/><rect x="14" y="158.5" width="212" height="3" fill="currentColor" opacity=".6"/><polyline points="34,150 64,130 94,140 124,100 154,110 184,80 210,120" fill="none" stroke="currentColor" stroke-width="6" stroke-linejoin="round"/>
+        <circle class="a-dot" style="--i:0" cx="34" cy="150" r="11" fill="currentColor"/><circle class="a-dot" style="--i:1" cx="64" cy="130" r="11" fill="currentColor"/><circle class="a-dot" style="--i:2" cx="94" cy="140" r="11" fill="currentColor"/><circle class="a-dot" style="--i:3" cx="124" cy="100" r="11" fill="currentColor"/><circle class="a-dot" style="--i:4" cx="154" cy="110" r="11" fill="currentColor"/><circle class="a-dot" style="--i:5" cx="184" cy="80" r="15" fill="var(--a1)"/><circle class="a-dot" style="--i:6" cx="210" cy="120" r="11" fill="currentColor"/></svg></div>
+  <div class="tile-body">
+    <p class="tile-tier">Studio Edition</p>
+    <h3 class="tile-title">Melodic Dictation Studio</h3>
+    <p class="tile-text">Hear a short melody, write it on the staff, and get feedback on every note.</p>
+    <p class="tile-price"><span data-price-for="melodic-dictation">$55</span></p>
+  </div>
+</a>
+    </div>
+  </div>
+</section>
+
+<section class="section how" aria-labelledby="how-title">
+  <div class="wrap">
+    <h2 id="how-title" class="h-staff">How buying and unlocking work</h2>
+    <ol class="steps">
+  <li><span class="step-n" aria-hidden="true">1</span><h3>Buy a tool</h3><p>Pay once through secure checkout. Prices are in US dollars, and taxes are shown before you pay.</p></li>
+  <li><span class="step-n" aria-hidden="true">2</span><h3>Get your key</h3><p>Your license key appears instantly on the order confirmation page. Copy it and keep it safe.</p></li>
+  <li><span class="step-n" aria-hidden="true">3</span><h3>Unlock and practise</h3><p>Enter the key on the <a href="./unlock/">unlock page</a>. Your tools open in your practice room on any device, with no account.</p></li>
+</ol>
+  </div>
+</section>
+
+<section class="section faq-preview" aria-labelledby="faqp-title">
+  <div class="wrap faq-grid">
+    <div>
+      <h2 id="faqp-title" class="h-staff">Questions</h2>
+      <p><a class="link-arrow" href="./faq/">Read all questions</a></p>
+    </div>
+    <div class="faq-list"><details class="faq-item"><summary><span>How do license keys work?</span><span class="faq-icon" aria-hidden="true"></span></summary><div class="faq-a"><p>When you buy a tool, the order confirmation page shows your license key straight away. It looks like <code class="key-sample">FRET-ET-7KQ4M-X9D2P-H6TR</code>. Enter it on the <a href="./unlock/">unlock page</a> and the tool opens in your practice room. The key is checked in your browser — there is no account, password or sign-in.</p></div></details><details class="faq-item"><summary><span>Can I use it on more than one device?</span><span class="faq-icon" aria-hidden="true"></span></summary><div class="faq-a"><p>Yes. Enter the same key on each of your devices — your computer, tablet and phone. Each device remembers the key after you enter it once. Keys are for your own personal use, so please don’t share them.</p></div></details><details class="faq-item"><summary><span>Are the sounds recordings of real instruments?</span><span class="faq-icon" aria-hidden="true"></span></summary><div class="faq-a"><p>No. Every sound — the plucked guitar tone, the keyboard tone and the metronome click — is synthesized in your browser as you play. They are designed to sound pleasant and clear, but they are not recordings of real instruments.</p></div></details><details class="faq-item"><summary><span>Does it work offline?</span><span class="faq-icon" aria-hidden="true"></span></summary><div class="faq-a"><p>Yes. Once you have unlocked your tools and opened the practice room while online, it is stored on your device and keeps working without an internet connection. You can also install it to your home screen or desktop like an app, using your browser’s “Install” or “Add to Home Screen” option.</p></div></details></div>
+  </div>
+</section>
+</main>
+<footer class="site-footer">
+  <div class="staff-rule" aria-hidden="true"></div>
+  <div class="wrap footer-grid">
+    <div class="footer-id">
+      <p class="footer-brand">Fretwell Music Lab</p>
+      <div data-footer-email></div>
+      <p class="footer-copy">© <span data-year>2026</span> Fretwell Music Lab</p>
+    </div>
+    <nav class="footer-nav" aria-label="Policies">
+      <h2 class="footer-h">Policies</h2>
+      <ul>
+        <li><a href="./terms/">Terms</a></li>
+        <li><a href="./privacy/">Privacy</a></li>
+        <li><a href="./refunds/">Refunds</a></li>
+        <li><a href="./delivery/">Delivery</a></li>
+        <li><a href="./disclaimer/">Disclaimer</a></li>
+        <li><a href="./accessibility/">Accessibility</a></li>
+        <li><a href="./contact/">Contact</a></li>
+      </ul>
+    </nav>
+    <nav class="footer-nav" aria-label="Products">
+      <h2 class="footer-h">Tools</h2>
+      <ul>
+        <li><a href="./products/note-reader/">Note Reader</a></li>
+        <li><a href="./products/interval-trainer/">Interval Ear Trainer</a></li>
+        <li><a href="./products/scale-explorer/">Scale &amp; Mode Explorer</a></li>
+        <li><a href="./products/chord-builder/">Chord Builder</a></li>
+        <li><a href="./products/rhythm-lab/">Rhythm Lab</a></li>
+        <li><a href="./products/foundations-bundle/">Foundations Bundle</a></li>
+        <li><a href="./products/progression-lab/">Progression Lab</a></li>
+        <li><a href="./products/jazz-harmony/">Jazz Harmony Studio</a></li>
+        <li><a href="./products/melodic-dictation/">Melodic Dictation Studio</a></li>
+        <li><a href="./products/atelier/">Atelier Edition</a></li>
+      </ul>
+    </nav>
+    <nav class="footer-nav" aria-label="Site">
+      <h2 class="footer-h">Site</h2>
+      <ul>
+        <li><a href="./">Home</a></li>
+        <li><a href="./about/">About</a></li>
+        <li><a href="./faq/">FAQ</a></li>
+        <li><a href="./unlock/">Have a key?</a></li>
+      </ul>
+    </nav>
+  </div>
+</footer>
+</body>
+</html>
