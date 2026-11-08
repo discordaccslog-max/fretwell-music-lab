@@ -12,6 +12,7 @@ import { TUNINGS } from '../core/theory.js';
 
 const app = document.getElementById('app');
 let unmount = null;
+let flash = ''; // a message to show on the next room view, surviving a hash change
 
 unlockOnFirstGesture();
 document.querySelectorAll('input[data-volume]').forEach((el) => {
@@ -52,6 +53,8 @@ window.addEventListener('hashchange', route);
 
 /* -------------------------------------------------------------- room */
 function roomView(message = '') {
+  if (!message && flash) message = flash;
+  flash = '';
   setNav('room');
   document.title = 'Practice room — Fretwell Music Lab';
   const tools = unlockedTools();
@@ -301,8 +304,8 @@ function keysView(message = '') {
       h('button', { type: 'button', class: 'btn btn-outline', onclick: async () => {
         if (await confirmDialog('Sign out on this device?', 'Your saved keys will be removed from this browser. Make sure you have your keys saved somewhere so you can enter them again.', 'Sign out')) {
           clearKeys();
-          location.hash = '#/';
-          roomView('You are signed out on this device. Your keys were removed from this browser.');
+          flash = 'You are signed out on this device. Your keys were removed from this browser.';
+          if (location.hash === '#/') roomView(); else location.hash = '#/';
         }
       } }, 'Sign out on this device')) : null);
   app.appendChild(wrap);
