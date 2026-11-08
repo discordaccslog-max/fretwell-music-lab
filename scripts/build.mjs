@@ -18,7 +18,7 @@ const ON_VERCEL = !!process.env.VERCEL;
 const HOSTING = ON_VERCEL
   ? 'The site itself is hosted on Vercel, and Vercel processes technical information such as IP addresses to deliver the pages and keep the service secure, under Vercel’s privacy policy. Vercel may show us basic request logs for troubleshooting; we do not use them to track or profile visitors, and we do not receive visitor logs from Google.'
   : 'The site itself is hosted on GitHub Pages, and GitHub processes technical information such as IP addresses to deliver the pages and keep the service secure, under GitHub’s privacy statement. We do not receive visitor logs from either service.';
-const FONTS = 'https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,500..900&family=IBM+Plex+Mono:wght@500;600&family=Instrument+Sans:wght@400..700&display=swap';
+const FONTS = 'https://fonts.googleapis.com/css2?family=Geist:wght@300..800&family=Geist+Mono:wght@500;600&display=swap';
 const YEAR = 2026;
 
 const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
@@ -717,7 +717,7 @@ writeFileSync(join(ROOT, 'sw.js'), `// Fretwell Music Lab — service worker (ge
 // Precaches the practice room and every tool so they work offline once loaded.
 // Pages are fetched from the network first and fall back to the cache when offline.
 const CACHE = 'fretwell-${version}';
-const FONT_CACHE = 'fretwell-fonts';
+const FONT_CACHE = 'fretwell-fonts-geist';
 const FONTS_CSS = '${FONTS}';
 const PRECACHE = ${JSON.stringify(precache, null, 2)};
 

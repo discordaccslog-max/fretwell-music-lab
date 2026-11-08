@@ -58,6 +58,6 @@ Run the build after changing page copy, prices in `js/products.js` (the pages al
 
 ## Notes
 
-- Fonts load from Google Fonts, which receives visitors' IP addresses when serving them; the Privacy Policy says so. For stricter EU privacy you can self-host the three font families (all under the SIL Open Font License) and drop the Google Fonts link.
+- Fonts load from Google Fonts, which receives visitors' IP addresses when serving them; the Privacy Policy says so. The site uses Geist and Geist Mono (SIL Open Font License). For stricter EU privacy you can self-host both and drop the Google Fonts link.
 - Notation glyphs are original SVG drawings, not a font.
 - The site never uses cookies, analytics, the microphone or the camera.
