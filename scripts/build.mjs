@@ -10,13 +10,20 @@ import { FAQ, ABOUT, REFUNDS, DELIVERY, DISCLAIMER, TERMS, PRIVACY, ACCESSIBILIT
 import { art, LOGO } from '../js/core/art.js';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
-export const SITE = 'https://discordaccslog-max.github.io/fretwell-music-lab/';
+// The site's primary address, used for canonical links, Open Graph tags, the sitemap and robots.txt.
+// Override with the SITE_URL environment variable (it must end with a slash).
+export const SITE = process.env.SITE_URL || 'https://fretwell-music-lab.vercel.app/';
+// Vercel sets VERCEL=1 during its builds; the Privacy Policy names whichever host serves the pages.
+const ON_VERCEL = !!process.env.VERCEL;
+const HOSTING = ON_VERCEL
+  ? 'The site itself is hosted on Vercel, and Vercel processes technical information such as IP addresses to deliver the pages and keep the service secure, under Vercel’s privacy policy. Vercel may show us basic request logs for troubleshooting; we do not use them to track or profile visitors, and we do not receive visitor logs from Google.'
+  : 'The site itself is hosted on GitHub Pages, and GitHub processes technical information such as IP addresses to deliver the pages and keep the service secure, under GitHub’s privacy statement. We do not receive visitor logs from either service.';
 const FONTS = 'https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,500..900&family=IBM+Plex+Mono:wght@500;600&family=Instrument+Sans:wght@400..700&display=swap';
 const YEAR = 2026;
 
 const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 const relRoot = (path) => (path === '' ? './' : '../'.repeat(path.split('/').filter(Boolean).length));
-const fill = (html, r) => html.replaceAll('{{r}}', r);
+const fill = (html, r) => html.replaceAll('{{r}}', r).replaceAll('{{hosting}}', HOSTING);
 
 const THEME_INIT = `<script>(function(){try{var d=document.documentElement,t=localStorage.getItem('fretwell.theme');if(t==='dark'||t==='light')d.setAttribute('data-theme',t);if(localStorage.getItem('fretwell.large')==='1')d.classList.add('is-large');}catch(e){}})();</script>`;
 
@@ -655,7 +662,8 @@ function notFoundPage() {
     <p><a class="btn btn-ink" href="{{r}}">Go to the home page</a> <a class="btn btn-outline" href="{{r}}unlock/">Enter a key</a></p>
   </div>
 </section>`;
-  // GitHub Pages serves 404.html at any depth, so it sets its own base URL before loading assets.
+  // The host serves 404.html at any depth, so it sets its own base URL before loading assets
+  // (/fretwell-music-lab/ on GitHub Pages, / on Vercel or a custom domain).
   const r = './';
   const baseScript = `<script>(function(){var p=location.pathname,m=p.match(/^\\/fretwell-music-lab\\//);document.write('<base href="'+(m?'/fretwell-music-lab/':'/')+'">');})();</script>`;
   const html = `${head({ path: '404.html', title: 'Page not found — Fretwell Music Lab', description: 'This page does not exist.', noindex: true, r }).replace('<meta charset="utf-8">', '<meta charset="utf-8">\n' + baseScript)}

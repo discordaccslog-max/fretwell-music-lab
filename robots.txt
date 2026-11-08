@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://discordaccslog-max.github.io/fretwell-music-lab/sitemap.xml
+Sitemap: https://fretwell-music-lab.vercel.app/sitemap.xml

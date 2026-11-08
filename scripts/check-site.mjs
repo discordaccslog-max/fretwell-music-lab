@@ -40,7 +40,7 @@ for (const f of html) {
 
 // 2. Placeholder and leftover text (site files only)
 const textFiles = files.filter((f) => /\.(html|js|css|webmanifest|xml|txt|svg)$/.test(f));
-const PLACEHOLDER = /\b(TODO|FIXME|TBD|lorem|ipsum|coming soon|placeholder text|your name here|example\.com)\b|\{\{r\}\}/i;
+const PLACEHOLDER = /\b(TODO|FIXME|TBD|lorem|ipsum|coming soon|placeholder text|your name here|example\.com)\b|\{\{(?:r|hosting)\}\}/i;
 for (const f of textFiles) {
   const lines = readFileSync(f, 'utf8').split('\n');
   lines.forEach((line, i) => {
