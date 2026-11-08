@@ -20,6 +20,9 @@ test('keys have the documented format and validate for the right product', () =>
   }
   assert.equal(validateKey(generateKey('foundations-bundle')).tools.length, 5);
   assert.deepEqual(validateKey(generateKey('atelier')).tools, ['atelier']);
+  const all = validateKey(generateKey('AA'));
+  assert.equal(all.ok, true);
+  assert.deepEqual(all.tools.sort(), ['atelier', 'chord-builder', 'interval-trainer', 'jazz-harmony', 'melodic-dictation', 'note-reader', 'progression-lab', 'rhythm-lab', 'scale-explorer']);
 });
 
 test('every product in products.js has a key code and a thank-you page path', () => {

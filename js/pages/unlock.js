@@ -39,8 +39,10 @@ form.addEventListener('submit', async (e) => {
   if (!saved.ok) { errorEl.textContent = saved.message; return; }
   input.mark('ok');
   const p = PRODUCT_BY_ID[v.product];
-  const names = v.tools.length > 1 ? 'all five Foundations tools' : (p ? p.name : 'your tool');
-  msg.textContent = saved.already ? `This key was already saved on this device. ${p ? p.name : ''} is in your practice room. Opening it now…` : `Key accepted. ${names[0].toUpperCase() + names.slice(1)} ${v.tools.length > 1 ? 'are' : 'is'} now in your practice room. Opening it now…`;
+  const name = p ? p.name : (v.label || 'Your tools');
+  const names = v.product === 'foundations-bundle' ? 'all five Foundations tools' : v.product === 'all-access' ? 'every tool' : name;
+  const verb = v.product === 'foundations-bundle' ? 'are' : 'is';
+  msg.textContent = saved.already ? `This key was already saved on this device. ${name} is in your practice room. Opening it now…` : `Key accepted. ${names[0].toUpperCase() + names.slice(1)} ${verb} now in your practice room. Opening it now…`;
   form.hidden = true;
   success.hidden = false;
   anim.resolve({ sound: isSoundOn() });

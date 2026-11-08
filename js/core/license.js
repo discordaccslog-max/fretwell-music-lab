@@ -13,6 +13,7 @@ const PREFIX = 'FRET';
 const SALT = 'fretwell-music-lab/keys/v1';
 
 // Product codes. FB (Foundations Bundle) unlocks all five Foundations tools.
+// AA is the owner's all-access code: it unlocks every tool and has no product page or thank-you page.
 export const PRODUCT_CODES = {
   NR: { product: 'note-reader', tools: ['note-reader'] },
   ET: { product: 'interval-trainer', tools: ['interval-trainer'] },
@@ -24,6 +25,7 @@ export const PRODUCT_CODES = {
   JZ: { product: 'jazz-harmony', tools: ['jazz-harmony'] },
   MD: { product: 'melodic-dictation', tools: ['melodic-dictation'] },
   AT: { product: 'atelier', tools: ['atelier'] },
+  AA: { product: 'all-access', label: 'Every tool (administrator access)', tools: ['note-reader', 'interval-trainer', 'scale-explorer', 'chord-builder', 'rhythm-lab', 'progression-lab', 'jazz-harmony', 'melodic-dictation', 'atelier'] },
 };
 
 export const CODE_FOR_PRODUCT = Object.fromEntries(Object.entries(PRODUCT_CODES).map(([c, v]) => [v.product, c]));
@@ -119,7 +121,7 @@ export function validateKey(input) {
   if (!PRODUCT_CODES[code]) return { ok: false, reason: 'product', message: 'We don’t recognise the product part of that key (the two letters after FRET). Check it against the key you saved.' };
   if (checksum(code, random) !== sum) return { ok: false, reason: 'checksum', message: 'That key doesn’t add up. One or more characters may be mistyped — check it against the key you saved.' };
   const info = PRODUCT_CODES[code];
-  return { ok: true, code, product: info.product, tools: info.tools.slice(), key: formatKey(c) };
+  return { ok: true, code, product: info.product, label: info.label || null, tools: info.tools.slice(), key: formatKey(c) };
 }
 
 /** Unique tool ids unlocked by a list of keys. */

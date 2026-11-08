@@ -120,7 +120,8 @@ function keyEntry(onSaved) {
     const r = addKey(v.key);
     if (!r.ok) { err.textContent = r.message; return; }
     const p = PRODUCT_BY_ID[v.product];
-    onSaved(r.already ? `That key was already saved. ${p.name} is in your room.` : `Key accepted. ${p.name} is now in your practice room.`);
+    const name = p ? p.name : (v.label || 'Your tools');
+    onSaved(r.already ? `That key was already saved. ${name} is in your room.` : `Key accepted. ${name} is now in your practice room.`);
   });
   return form;
 }
@@ -293,7 +294,7 @@ function keysView(message = '') {
     keys.length ? h('ul', { class: 'key-list' }, keys.map((k) => {
       const v = validateKey(k);
       const p = PRODUCT_BY_ID[v.product];
-      return h('li', {}, h('span', { class: 'kl-name' }, p ? p.name : v.product), h('code', { class: 'kl-key' }, k));
+      return h('li', {}, h('span', { class: 'kl-name' }, p ? p.name : (v.label || v.product)), h('code', { class: 'kl-key' }, k));
     })) : h('p', { class: 'muted' }, 'No keys are saved on this device.'),
     h('h2', {}, 'Add a key'),
     h('p', {}, 'Each key you add brings its tools into this practice room.'),
