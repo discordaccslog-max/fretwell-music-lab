@@ -31,7 +31,7 @@ test('every product in products.js has a key code and a thank-you page path', ()
     assert.equal(v.ok, true, p.id);
     assert.equal(v.product, p.id);
     assert.match(p.thankYouPath, /^thank-you\/[a-z-]+\/$/);
-    assert.equal(p.checkoutUrl, '');
+    assert.ok(p.checkoutUrl === '' || /^https:\/\/\S+$/.test(p.checkoutUrl), `${p.id} checkout link must be empty or https`);
     assert.equal(typeof p.price, 'number');
   }
   const prices = Object.fromEntries(PRODUCTS.map((p) => [p.id, p.price]));

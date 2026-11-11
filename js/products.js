@@ -47,7 +47,7 @@ export const PRODUCTS = [
     price: 19,
     thankYouPath: 'thank-you/chord-builder/',
     pagePath: 'products/chord-builder/',
-    checkoutUrl: '',
+    checkoutUrl: 'https://square.link/u/PnXr1H3r',
   },
   {
     id: 'rhythm-lab',
