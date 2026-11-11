@@ -45,6 +45,17 @@ Keys look like `FRET-ET-7KQ4M-X9D2P-H6TR`: a product code, ten random characters
 
 `vercel.json` runs `node scripts/build.mjs` on every deploy, serves the project root, adds trailing slashes (the pages use relative links), sets a few security headers and stops browsers caching `sw.js`. During Vercel builds the Privacy Policy names Vercel as the host. To use your own domain, add it in the Vercel project settings and set the `SITE_URL` environment variable (for example `https://yourdomain.com/`) so canonical links, social previews and the sitemap use it. Deploy manually with `vercel deploy --prod`.
 
+## Fulfillment evidence kit
+
+`scripts/fulfillment-kit.mjs` walks the live purchase-to-delivery flow for every product with Playwright (driving your installed Chrome), and writes a private kit to `fulfillment-kit/`: full-page screenshots of each step, saved and printed confirmations, a screen recording, a paste-ready Business and Fulfillment Summary, reviewer keys and `Fulfillment-Overview.pdf`. The folder is ignored by git and Vercel. Rerun it after connecting more checkout links:
+
+```bash
+npm i -D playwright && npx playwright install ffmpeg
+node scripts/fulfillment-kit.mjs
+```
+
+Each run creates new, permanent reviewer keys.
+
 ## Commands
 
 ```bash

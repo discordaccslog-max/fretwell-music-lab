@@ -111,6 +111,8 @@ button, input, select, textarea { font: inherit; color: inherit; }
 input[type="range"] { accent-color: var(--vermilion); }
 :focus { outline: none; }
 :focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; }
+/* Headings that receive focus only so screen readers announce a new view don't need a ring. */
+[tabindex="-1"]:focus { outline: none; }
 ::selection { background: var(--saffron); color: #121212; }
 
 .wrap { width: 100%; max-width: var(--maxw); margin: 0 auto; padding: 0 var(--gutter); }
