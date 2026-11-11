@@ -1,9 +1,11 @@
 // Copy for the informational and policy pages. {{r}} is replaced with the relative path to the site root.
 
 export const LAST_UPDATED = 'November 8, 2026';
+export const UPDATED_NOV_11 = { label: 'November 11, 2026', iso: '2026-11-11' };
 
 export const FAQ = [
   ['How do license keys work?', `<p>When you buy a tool, the order confirmation page shows your license key straight away. It looks like <code class="key-sample">FRET-ET-7KQ4M-X9D2P-H6TR</code>. Enter it on the <a href="{{r}}unlock/">unlock page</a> and the tool opens in your practice room. The key is checked in your browser — there is no account, password or sign-in.</p>`],
+  ['What do I receive after I buy, and how?', `<p>You receive a license key, delivered instantly on screen. As soon as your payment is complete, our payment provider returns you to your order confirmation page, which shows your key, the product name, the date and time and, when the payment provider supplies one, your order reference. You can copy the key, save the confirmation as a text file or print it. Enter the key on the <a href="{{r}}unlock/">unlock page</a> and your tools open in your practice room, in your browser. Nothing is shipped and there is nothing you need to download. See the <a href="{{r}}delivery/">Delivery Policy</a> for every step.</p>`],
   ['Where do I enter my key?', `<p>On the <a href="{{r}}unlock/">unlock page</a>, which you can reach from the “Have a key?” link at the top of every page. Inside the practice room you can also add more keys from the “Add a key” section.</p>`],
   ['How should I save my key?', `<p>Copy it into a notes app or password manager, or use the “Save as text file” button on the confirmation page. Keep it somewhere you can find it later; you will need it to open your tools on another device or browser.</p>`],
   ['Can I use it on more than one device?', `<p>Yes. Enter the same key on each of your devices — your computer, tablet and phone. Each device remembers the key after you enter it once. Keys are for your own personal use, so please don’t share them.</p>`],
@@ -56,15 +58,23 @@ export const REFUNDS = `
 `;
 
 export const DELIVERY = `
-<p>All Fretwell Music Lab products are digital. There is no physical shipment.</p>
-<h2>How you receive your purchase</h2>
-<p>After you pay, you are taken to your order confirmation page, where your license key appears immediately. Copy the key and save it somewhere safe — the page has a copy button and an option to save the key as a text file.</p>
-<h2>Opening your tools</h2>
-<p>Enter your key on the site’s <a href="{{r}}unlock/">unlock page</a> (also reachable from the “Have a key?” link at the top of every page). Your tools open right away in your practice room. You can enter the same key on any of your own devices, and you can install the practice room to work offline.</p>
+<p>All Fretwell Music Lab products are digital: online music-training tools that you unlock with a license key. There is no physical shipment, and nothing is posted to you.</p>
+<h2>How delivery works, step by step</h2>
+<ol>
+  <li><strong>You agree and pay.</strong> On the product page you tick the box agreeing to the <a href="{{r}}terms/">Terms of Service</a> and <a href="{{r}}refunds/">Refund Policy</a>, then complete payment on our payment provider’s secure checkout.</li>
+  <li><strong>You return to your order confirmation page.</strong> As soon as your payment is complete, the payment provider sends you to that product’s order confirmation page on this site.</li>
+  <li><strong>Your license key appears immediately.</strong> The confirmation page creates your license key in your browser and shows it straight away, together with the product name, the date and time and, when the payment provider supplies one, your order reference.</li>
+  <li><strong>You save your key.</strong> Copy the key, use “Save confirmation” to download a text file containing your order details and key, or print the page.</li>
+  <li><strong>You unlock your tools.</strong> Select “Open my tools”, or go to the <a href="{{r}}unlock/">unlock page</a> (also reachable from the “Have a key?” link at the top of every page), and enter your key. Your tools open right away in your practice room, in your web browser.</li>
+</ol>
+<h2>When delivery happens</h2>
+<p>Delivery is immediate: your key is shown within seconds of your payment being completed, on the page the payment provider returns you to. The key is not posted or emailed by us, so save it from the confirmation page.</p>
+<h2>Using your key on more devices</h2>
+<p>You can enter the same key on any of your own devices — computer, tablet or phone. Each device remembers your key once entered, and you can install the practice room to keep working offline.</p>
 <h2>What you need</h2>
 <p>A recent web browser on a computer, tablet or phone, and speakers or headphones. An internet connection is needed to unlock your tools and load them the first time; after that they keep working offline.</p>
-<h2>If you lose your key</h2>
-<p>Get in touch through the <a href="{{r}}contact/">Contact page</a> with your order number and we will send you a replacement key. The same applies if the confirmation page closed before you could save your key.</p>
+<h2>If you lose your key or the page closes</h2>
+<p>Get in touch through the <a href="{{r}}contact/">Contact page</a> with your order number and we will send you a replacement key in our reply. The same applies if the confirmation page closed before you could save your key.</p>
 <h2>How long access lasts</h2>
 <p>Online access continues for as long as Fretwell Music Lab operates. Tools you have installed and opened on a device keep working on that device without an internet connection.</p>
 `;
@@ -97,23 +107,25 @@ export const TERMS = `
 <p>If you would like to use the tools with students or in a classroom, contact us through the <a href="{{r}}contact/">Contact page</a> to ask about a classroom license.</p>
 <h2>5. Prices, taxes and payment</h2>
 <p>Prices are shown in US dollars on each product page. Each product is a one-time purchase, not a subscription. Payment is handled by our third-party payment provider at checkout. Applicable taxes are calculated and shown at checkout before you pay, according to your location.</p>
-<h2>6. Delivery</h2>
+<h2>6. Agreeing before you buy</h2>
+<p>Before you can continue to checkout, you must tick the box on the product page confirming that you agree to these Terms of Service and our <a href="{{r}}refunds/">Refund Policy</a>. The buy button stays inactive until you do. By completing a purchase, you confirm that you have read and agree to both.</p>
+<h2>7. Delivery</h2>
 <p>Products are delivered digitally as described in our <a href="{{r}}delivery/">Delivery Policy</a>.</p>
-<h2>7. Refunds</h2>
+<h2>8. Refunds</h2>
 <p>Refunds are available as described in our <a href="{{r}}refunds/">Refund Policy</a>.</p>
-<h2>8. Ownership</h2>
+<h2>9. Ownership</h2>
 <p>All software, exercises, sounds, designs and site content are owned by Fretwell Music Lab. Your license lets you use the tools; it doesn’t transfer ownership of them. You may not copy, modify, redistribute or resell the software or content, except as the law allows.</p>
-<h2>9. Acceptable use</h2>
+<h2>10. Acceptable use</h2>
 <p>Please don’t try to get around the license key system, interfere with the site, or use it in a way that breaks the law.</p>
-<h2>10. Warranties</h2>
+<h2>11. Warranties</h2>
 <p>We work to keep the tools accurate and working well. To the extent permitted by law, the site and products are provided “as is”, without warranties of any kind, whether express or implied, including warranties of fitness for a particular purpose.</p>
-<h2>11. Limitation of liability</h2>
+<h2>12. Limitation of liability</h2>
 <p>To the extent permitted by law, Fretwell Music Lab’s total liability to you for any claim relating to the site or a product is limited to the amount you paid for that product.</p>
-<h2>12. Your statutory rights</h2>
+<h2>13. Your statutory rights</h2>
 <p>Nothing in these terms limits rights you have under consumer protection law that cannot be excluded or limited, including any rights you have where digital content is faulty or not as described.</p>
-<h2>13. Changes to these terms</h2>
+<h2>14. Changes to these terms</h2>
 <p>We may update these terms from time to time. When we do, we will post the new version on this page and change the date at the top. The terms in force when you made a purchase apply to that purchase.</p>
-<h2>14. Contact</h2>
+<h2>15. Contact</h2>
 <p>Questions about these terms? Contact us through the <a href="{{r}}contact/">Contact page</a>.</p>
 `;
 

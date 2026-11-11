@@ -6,7 +6,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { PRODUCTS, PRODUCT_BY_ID } from '../js/products.js';
 import { PRODUCT_CONTENT } from './content-products.mjs';
-import { FAQ, ABOUT, REFUNDS, DELIVERY, DISCLAIMER, TERMS, PRIVACY, ACCESSIBILITY, LAST_UPDATED } from './content-pages.mjs';
+import { FAQ, ABOUT, REFUNDS, DELIVERY, DISCLAIMER, TERMS, PRIVACY, ACCESSIBILITY, LAST_UPDATED, UPDATED_NOV_11 } from './content-pages.mjs';
 import { art, LOGO } from '../js/core/art.js';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -290,7 +290,7 @@ function homePage() {
       <h2 id="faqp-title" class="h-staff">Questions</h2>
       <p><a class="link-arrow" href="{{r}}faq/">Read all questions</a></p>
     </div>
-    ${faqList([FAQ[0], FAQ[3], FAQ[7], FAQ[5]])}
+    ${faqList([FAQ[0], FAQ[1], FAQ[4], FAQ[8]])}
   </div>
 </section>`;
   page({
@@ -404,40 +404,50 @@ function thankYouPage(p) {
 <section class="thanks" data-product="${p.id}">
   <div class="wrap thanks-grid">
     <div class="thanks-copy">
-      <p class="eyebrow">Order complete</p>
-      <h1 class="display-sm">Thank you. Here is your key.</h1>
-      <p class="lede">This license key unlocks <strong>${esc(tools)}</strong>.</p>
+      <p class="eyebrow">Order confirmation</p>
+      <h1 class="display-sm">Order complete. Your product is delivered.</h1>
+      <p class="lede">Thank you for your purchase. Your license key for <strong>${esc(tools)}</strong> is ready to use now.</p>
+      <dl class="confirm-details" aria-label="Order details">
+        <div><dt>Status</dt><dd>Complete — delivered</dd></div>
+        <div><dt>Product</dt><dd>${esc(p.name)}</dd></div>
+        <div><dt>Date and time</dt><dd data-confirm-date>Shown when this page opens</dd></div>
+        <div data-order-row hidden><dt>Order reference</dt><dd data-order-number></dd></div>
+        <div><dt>Delivery</dt><dd>Digital license key, shown on this page. No physical shipment.</dd></div>
+      </dl>
     </div>
     <div class="key-reveal" data-key-reveal>
       <p class="key-label" id="key-label">Your license key</p>
       <p class="key-display" aria-labelledby="key-label" data-key-display><span class="key-placeholder">Generating your key…</span></p>
       <div class="key-actions">
         <button class="btn btn-ink" type="button" data-copy-key>Copy key</button>
-        <button class="btn btn-outline" type="button" data-save-key>Save as text file</button>
+        <button class="btn btn-outline" type="button" data-save-confirmation>Save confirmation</button>
+        <button class="btn btn-outline" type="button" data-print>Print</button>
         <button class="sound-toggle sound-toggle--small" type="button" aria-pressed="false" data-sound-toggle><span class="sound-icon" aria-hidden="true"></span><span class="sound-label">Sound</span></button>
       </div>
-      <p class="order-ref" data-order-ref hidden>Order number: <strong data-order-number></strong>. Keep it with your key; include it if you ever contact us.</p>
       <p class="key-status" role="status" aria-live="polite" data-key-status></p>
       <div class="key-reminder">
-        <p><strong>Save this key now.</strong> Copy it into a notes app or password manager, or save the file. You will need it to open your tools on another device or browser.</p>
+        <p><strong>Save this key now.</strong> Copy it into a notes app or password manager, or save the confirmation. You will need it to open your tools on another device or browser.</p>
       </div>
       <a class="btn btn-vermilion btn-lg" href="{{r}}unlock/" data-open-tools>Open my tools</a>
     </div>
   </div>
   <div class="wrap">
     ${staffRule}
+    <h2 class="h-staff thanks-h">How to use your key</h2>
     <ol class="steps">
-      <li><span class="step-n" aria-hidden="true">1</span><h3>Save your key</h3><p>Copy it or save the file before you leave this page.</p></li>
-      <li><span class="step-n" aria-hidden="true">2</span><h3>Open your tools</h3><p>“Open my tools” takes you to the unlock page with your key filled in. Press Unlock.</p></li>
+      <li><span class="step-n" aria-hidden="true">1</span><h3>Save your key</h3><p>Copy it or save the confirmation before you leave this page.</p></li>
+      <li><span class="step-n" aria-hidden="true">2</span><h3>Open your tools</h3><p>“Open my tools” takes you to the unlock page with your key filled in. Press Unlock and your tools open in your practice room.</p></li>
       <li><span class="step-n" aria-hidden="true">3</span><h3>Practise anywhere</h3><p>Enter the same key on your other devices. Install the practice room to use it offline.</p></li>
     </ol>
+    <p class="thanks-policies">Your purchase is covered by our <a href="{{r}}terms/">Terms of Service</a>, <a href="{{r}}refunds/">Refund Policy</a> and <a href="{{r}}delivery/">Delivery Policy</a>.</p>
+    <p class="print-only">Terms of Service: ${SITE}terms/ · Refund Policy: ${SITE}refunds/ · Delivery Policy: ${SITE}delivery/ · Unlock page: ${SITE}unlock/</p>
     <p class="thanks-help">Lost your key later? Contact us through the <a href="{{r}}contact/">Contact page</a> with your order number for a replacement.</p>
   </div>
 </section>`;
   page({
     path: p.thankYouPath,
-    title: `Your license key — ${p.shortName} — Fretwell Music Lab`,
-    description: `License key for ${p.name}.`,
+    title: `Order confirmation — ${p.shortName} — Fretwell Music Lab`,
+    description: `Order confirmation and license key for ${p.name}.`,
     body,
     noindex: true,
     scripts: ['js/pages/thank-you.js'],
@@ -585,14 +595,14 @@ ${THEME_INIT}
 
 /* ------------------------------------------------------------ text pages */
 
-function textPage({ path, title, h1, description, html, dated = false, eyebrow = '' }) {
+function textPage({ path, title, h1, description, html, dated = false, eyebrow = '', updated = { label: LAST_UPDATED, iso: '2026-11-08' } }) {
   const body = `
 <section class="text-page">
   <div class="wrap text-wrap">
     <header class="text-head">
       ${eyebrow ? `<p class="eyebrow">${eyebrow}</p>` : ''}
       <h1 class="display-sm">${esc(h1)}</h1>
-      ${dated ? `<p class="updated">Last updated: <time datetime="2026-11-08">${LAST_UPDATED}</time></p>` : ''}
+      ${dated ? `<p class="updated">Last updated: <time datetime="${updated.iso}">${updated.label}</time></p>` : ''}
     </header>
     ${staffRule}
     <div class="prose">${html}</div>
@@ -690,10 +700,10 @@ practicePage();
 textPage({ path: 'about/', title: 'About — Fretwell Music Lab', h1: 'About Fretwell Music Lab', description: 'What Fretwell Music Lab makes and why: browser-based theory and ear-training tools with generated exercises and synthesized sound.', html: ABOUT, eyebrow: 'About' });
 faqPage();
 contactPage();
-textPage({ path: 'terms/', title: 'Terms of Service — Fretwell Music Lab', h1: 'Terms of Service', description: 'The terms that apply when you use the Fretwell Music Lab website and buy and use its products.', html: TERMS, dated: true, eyebrow: 'Policies' });
+textPage({ path: 'terms/', title: 'Terms of Service — Fretwell Music Lab', h1: 'Terms of Service', description: 'The terms that apply when you use the Fretwell Music Lab website and buy and use its products.', html: TERMS, dated: true, eyebrow: 'Policies', updated: UPDATED_NOV_11 });
 textPage({ path: 'privacy/', title: 'Privacy Policy — Fretwell Music Lab', h1: 'Privacy Policy', description: 'No cookies, no analytics, no trackers. Your keys, progress and settings stay in your browser. How order information is handled and your rights.', html: PRIVACY, dated: true, eyebrow: 'Policies' });
 textPage({ path: 'refunds/', title: 'Refund Policy — Fretwell Music Lab', h1: 'Refund Policy', description: 'Full refund on any Fretwell Music Lab purchase within 14 days, no reason required.', html: REFUNDS, dated: true, eyebrow: 'Policies' });
-textPage({ path: 'delivery/', title: 'Delivery Policy — Fretwell Music Lab', h1: 'Delivery Policy', description: 'All products are digital. Your license key appears immediately after payment and unlocks your tools on any device.', html: DELIVERY, dated: true, eyebrow: 'Policies' });
+textPage({ path: 'delivery/', title: 'Delivery Policy — Fretwell Music Lab', h1: 'Delivery Policy', description: 'All products are digital. Your license key appears immediately after payment and unlocks your tools on any device.', html: DELIVERY, dated: true, eyebrow: 'Policies', updated: UPDATED_NOV_11 });
 textPage({ path: 'disclaimer/', title: 'Disclaimer — Fretwell Music Lab', h1: 'Disclaimer', description: 'Fretwell Music Lab tools are practice aids, not lessons. No specific results are promised. Sounds are synthesized.', html: DISCLAIMER, dated: true, eyebrow: 'Policies' });
 textPage({ path: 'accessibility/', title: 'Accessibility — Fretwell Music Lab', h1: 'Accessibility', description: 'Keyboard operation, shortcuts, contrast, a larger-interface setting and other accessibility features of Fretwell Music Lab, and known limitations.', html: ACCESSIBILITY, dated: true, eyebrow: 'Policies' });
 notFoundPage();

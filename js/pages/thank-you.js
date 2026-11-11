@@ -1,4 +1,4 @@
-// Thank-you page: generate a license key in the browser and reveal it.
+// Thank-you page: the order confirmation. Generates the license key in the browser and reveals it.
 import { generateKey } from '../core/license.js';
 import { PRODUCT_BY_ID } from '../products.js';
 import { arpeggio, isReady } from '../core/audio.js';
@@ -12,15 +12,24 @@ const status = document.querySelector('[data-key-status]');
 const key = generateKey(productId);
 const reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-// Checkouts such as Square payment links add the order number to the address when they redirect here
-// (Square uses orderId and transactionId). Show it beside the key; it is never sent anywhere.
+// Payment providers add their order reference to the address when they redirect here
+// (Square uses orderId and transactionId; others use the names below). It is shown, never sent anywhere.
 const params = new URLSearchParams(location.search);
-const orderRaw = params.get('orderId') || params.get('order_id') || params.get('transactionId') || params.get('transaction_id') || '';
-const orderRef = /^[A-Za-z0-9_-]{4,80}$/.test(orderRaw) ? orderRaw : '';
+const ORDER_PARAMS = ['order_id', 'orderId', 'order', 'session_id', 'transaction_id', 'transactionId', 'txn_id', 'token'];
+const orderRaw = ORDER_PARAMS.map((n) => params.get(n)).find((v) => v) || '';
+const orderRef = /^[A-Za-z0-9_.:-]{4,120}$/.test(orderRaw) ? orderRaw : '';
 if (orderRef) {
   document.querySelector('[data-order-number]').textContent = orderRef;
-  document.querySelector('[data-order-ref]').hidden = false;
+  document.querySelector('[data-order-row]').hidden = false;
 }
+
+// Delivery time: the moment the key was generated and shown.
+const delivered = new Date();
+const timeZone = (() => { try { return Intl.DateTimeFormat().resolvedOptions().timeZone; } catch { return ''; } })();
+const deliveredText = (() => {
+  try { return new Intl.DateTimeFormat(undefined, { dateStyle: 'long', timeStyle: 'short' }).format(delivered) + (timeZone ? ` (${timeZone})` : ''); } catch { return delivered.toString(); }
+})();
+document.querySelector('[data-confirm-date]').textContent = deliveredText;
 
 initSoundToggles();
 
@@ -82,18 +91,48 @@ document.querySelector('[data-copy-key]').addEventListener('click', async () => 
   }
 });
 
-document.querySelector('[data-save-key]').addEventListener('click', () => {
-  const unlockUrl = new URL('../../unlock/', location.href).href;
-  const text = `Fretwell Music Lab — license key\n\nProduct: ${product ? product.name : productId}\nKey: ${key}\n${orderRef ? `Order number: ${orderRef}\n` : ''}\nTo open your tools, enter this key at:\n${unlockUrl}\n\nYou can enter the same key on each of your own devices.\nKeep this file somewhere safe.\n`;
-  const blob = new Blob([text], { type: 'text/plain' });
+const abs = (path) => new URL('../../' + path, location.href).href;
+
+function confirmationText() {
+  const name = product ? product.name : productId;
+  return [
+    'Fretwell Music Lab — Order confirmation',
+    '',
+    'Status: Order complete — delivered',
+    `Product: ${name}`,
+    `Date and time: ${deliveredText}`,
+    orderRef ? `Order reference: ${orderRef}` : null,
+    `License key: ${key}`,
+    'Delivery: digital license key, shown on the order confirmation page. No physical shipment.',
+    '',
+    'How to use your key:',
+    `1. Go to ${abs('unlock/')}`,
+    '2. Enter your license key and press Unlock.',
+    '3. Your tools open straight away in your practice room. Enter the same key on each of your own devices.',
+    '',
+    `Terms of Service: ${abs('terms/')}`,
+    `Refund Policy: ${abs('refunds/')}`,
+    `Delivery Policy: ${abs('delivery/')}`,
+    `Support: ${abs('contact/')}`,
+    '',
+    'Keep this confirmation somewhere safe. If you lose your key, contact us with your order reference for a replacement.',
+    '',
+  ].filter((line) => line !== null).join('\n');
+}
+
+document.querySelector('[data-save-confirmation]').addEventListener('click', () => {
+  const blob = new Blob([confirmationText()], { type: 'text/plain' });
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
-  a.download = `fretwell-license-key-${productId}.txt`;
+  const day = `${delivered.getFullYear()}-${String(delivered.getMonth() + 1).padStart(2, '0')}-${String(delivered.getDate()).padStart(2, '0')}`;
+  a.download = `fretwell-order-confirmation-${productId}-${day}.txt`;
   document.body.appendChild(a);
   a.click();
   setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
-  say('✓ Saved as a text file.');
+  say('✓ Confirmation saved as a text file.');
 });
+
+document.querySelector('[data-print]').addEventListener('click', () => window.print());
 
 document.querySelector('[data-open-tools]').addEventListener('click', () => {
   try { sessionStorage.setItem('fretwell.pendingKey', key); } catch { /* the buyer can paste the key instead */ }

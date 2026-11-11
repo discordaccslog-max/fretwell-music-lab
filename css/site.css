@@ -149,7 +149,7 @@ input[type="range"] { accent-color: var(--vermilion); }
 .btn-sm { min-height: 40px; padding: 0.45em 0.9em; font-size: 0.92rem; }
 .btn[disabled], .btn[aria-disabled="true"] { opacity: 0.45; cursor: not-allowed; }
 @media (hover: hover) {
-  .btn:not([disabled]):hover { transform: translateY(-2px); }
+  .btn:not([disabled]):not([aria-disabled="true"]):hover { transform: translateY(-2px); }
 }
 .link-arrow { font-weight: 700; text-decoration: none; border-bottom: 2px solid currentColor; }
 .link-arrow::after { content: " →"; }
@@ -409,6 +409,12 @@ input[type="range"] { accent-color: var(--vermilion); }
 .price-cur { font: 700 1rem/1 var(--font-body); letter-spacing: 0.08em; vertical-align: top; }
 .price-terms { font-size: 0.95rem; line-height: 1.5; padding: 12px 0; border-top: 2px solid var(--fg); border-bottom: 2px solid var(--fg); margin-bottom: 16px; }
 .buy-slot:not(:empty) { margin-bottom: 16px; }
+.agree { display: flex; align-items: flex-start; gap: 10px; margin: 0 0 12px; font-size: 0.95rem; line-height: 1.45; }
+.agree input { width: 22px; height: 22px; margin: 1px 0 0; accent-color: var(--vermilion); flex: none; cursor: pointer; }
+.agree label { cursor: pointer; }
+.agree-hint { font-size: 0.88rem; color: var(--muted); margin: 8px 0 0; }
+.agree-hint.is-needed { color: var(--bad); font-weight: 700; }
+.btn-buy[aria-disabled="true"] { cursor: not-allowed; }
 .btn-buy { width: 100%; background: var(--vermilion); color: #121212; border-color: #121212; font-size: 1.15rem; min-height: 58px; }
 .buy-facts { list-style: none; padding: 0; margin: 0 0 14px; font-size: 0.95rem; }
 .buy-facts li { padding: 6px 0; border-bottom: 1px solid var(--soft-rule); }
@@ -501,11 +507,39 @@ select, .input { min-height: 44px; border: 2px solid var(--fg); background: var(
 .key-placeholder { color: var(--muted); font-size: 1rem; }
 .key-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 12px; }
 .key-status { min-height: 1.6em; font-weight: 600; color: var(--ok); }
-.order-ref { margin: 0 0 6px; font-size: 0.95rem; }
-.order-ref strong { font-family: var(--font-mono); font-weight: 600; word-break: break-all; }
 .key-reminder { background: var(--saffron); color: #121212; padding: 14px 16px; border: 2px solid #121212; margin-bottom: 18px; }
 .key-reminder p { margin: 0; }
 .thanks-help { margin-top: 24px; }
+.confirm-details { margin: 28px 0 0; border-top: 3px solid var(--fg); }
+.confirm-details > div { display: grid; grid-template-columns: 150px 1fr; gap: 2px 16px; padding: 10px 0; border-bottom: 1px solid var(--soft-rule); }
+.confirm-details dt { font-weight: 700; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.1em; padding-top: 3px; }
+.confirm-details dd { margin: 0; overflow-wrap: anywhere; }
+.confirm-details [data-order-number] { font-family: var(--font-mono); font-weight: 600; }
+@media (max-width: 480px) { .confirm-details > div { grid-template-columns: 1fr; } }
+.thanks .display-sm { font-size: clamp(2.2rem, 5vw, 4rem); }
+.thanks-h { margin: 8px 0 24px; font-size: clamp(1.6rem, 3vw, 2.2rem); }
+.thanks-policies { margin-top: 28px; }
+.print-only { display: none; }
+@media print {
+  :root, :root[data-theme="dark"], :root:not([data-theme="light"]) { --bg: #fff; --surface: #fff; --fg: #111; --muted: #333; --rule: #111; --soft-rule: #bbb; --ok: #176B43; --accent-text: #111; }
+  @page { margin: 14mm; }
+  body { background: #fff; color: #111; font-size: 11pt; }
+  .site-header, .site-footer, .skip-link, .key-actions, [data-open-tools], .sound-toggle, .staff-rule, .key-status, .thanks-help { display: none !important; }
+  .print-only { display: block; font-size: 9.5pt; overflow-wrap: anywhere; margin-top: 8px; }
+  .thanks { padding-top: 0; }
+  .thanks-grid { display: block; }
+  .thanks-copy { margin-bottom: 14px; }
+  .display-sm { font-size: 22pt; }
+  .lede { font-size: 12pt; }
+  .key-reveal { padding: 12px; break-inside: avoid; }
+  .key-display { font-size: 16pt; }
+  .key-char { opacity: 1 !important; transform: none !important; animation: none !important; }
+  .key-reminder { background: none; border: 1px solid #111; }
+  .steps { border-top-width: 2px; }
+  .steps li { break-inside: avoid; padding: 10px 10px 10px 0; }
+  .step-n { font-size: 20pt; color: #111; }
+  a { color: #111; }
+}
 .key-legend { font: 650 1.3rem/1 var(--font-head); padding: 0; margin-bottom: 14px; }
 .key-form fieldset { border: 0; padding: 0; margin: 0; }
 .key-boxes { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
