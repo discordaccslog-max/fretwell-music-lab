@@ -12,6 +12,16 @@ const status = document.querySelector('[data-key-status]');
 const key = generateKey(productId);
 const reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+// Checkouts such as Square payment links add the order number to the address when they redirect here
+// (Square uses orderId and transactionId). Show it beside the key; it is never sent anywhere.
+const params = new URLSearchParams(location.search);
+const orderRaw = params.get('orderId') || params.get('order_id') || params.get('transactionId') || params.get('transaction_id') || '';
+const orderRef = /^[A-Za-z0-9_-]{4,80}$/.test(orderRaw) ? orderRaw : '';
+if (orderRef) {
+  document.querySelector('[data-order-number]').textContent = orderRef;
+  document.querySelector('[data-order-ref]').hidden = false;
+}
+
 initSoundToggles();
 
 function reveal() {
@@ -74,7 +84,7 @@ document.querySelector('[data-copy-key]').addEventListener('click', async () => 
 
 document.querySelector('[data-save-key]').addEventListener('click', () => {
   const unlockUrl = new URL('../../unlock/', location.href).href;
-  const text = `Fretwell Music Lab — license key\n\nProduct: ${product ? product.name : productId}\nKey: ${key}\n\nTo open your tools, enter this key at:\n${unlockUrl}\n\nYou can enter the same key on each of your own devices.\nKeep this file somewhere safe.\n`;
+  const text = `Fretwell Music Lab — license key\n\nProduct: ${product ? product.name : productId}\nKey: ${key}\n${orderRef ? `Order number: ${orderRef}\n` : ''}\nTo open your tools, enter this key at:\n${unlockUrl}\n\nYou can enter the same key on each of your own devices.\nKeep this file somewhere safe.\n`;
   const blob = new Blob([text], { type: 'text/plain' });
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);

@@ -416,6 +416,7 @@ function thankYouPage(p) {
         <button class="btn btn-outline" type="button" data-save-key>Save as text file</button>
         <button class="sound-toggle sound-toggle--small" type="button" aria-pressed="false" data-sound-toggle><span class="sound-icon" aria-hidden="true"></span><span class="sound-label">Sound</span></button>
       </div>
+      <p class="order-ref" data-order-ref hidden>Order number: <strong data-order-number></strong>. Keep it with your key; include it if you ever contact us.</p>
       <p class="key-status" role="status" aria-live="polite" data-key-status></p>
       <div class="key-reminder">
         <p><strong>Save this key now.</strong> Copy it into a notes app or password manager, or save the file. You will need it to open your tools on another device or browser.</p>

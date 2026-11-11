@@ -501,6 +501,8 @@ select, .input { min-height: 44px; border: 2px solid var(--fg); background: var(
 .key-placeholder { color: var(--muted); font-size: 1rem; }
 .key-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 12px; }
 .key-status { min-height: 1.6em; font-weight: 600; color: var(--ok); }
+.order-ref { margin: 0 0 6px; font-size: 0.95rem; }
+.order-ref strong { font-family: var(--font-mono); font-weight: 600; word-break: break-all; }
 .key-reminder { background: var(--saffron); color: #121212; padding: 14px 16px; border: 2px solid #121212; margin-bottom: 18px; }
 .key-reminder p { margin: 0; }
 .thanks-help { margin-top: 24px; }
