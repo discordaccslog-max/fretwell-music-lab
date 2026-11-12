@@ -269,8 +269,6 @@ const embedded = new Map();
 const rel = (abs) => embedded.get(abs);
 const main = results.find((r) => r.product.id === videoProduct.id);
 const fig = (src, caption) => `<figure><img src="${rel(src)}" alt=""><figcaption>${caption}</figcaption></figure>`;
-const connected = results.filter((r) => r.checkout).map((r) => r.product.name);
-const notConnected = results.filter((r) => !r.checkout).map((r) => r.product.name);
 const html = `<!doctype html><html><head><meta charset="utf-8"><title>Fretwell Music Lab — Fulfillment Overview</title><style>
 @page { size: Letter; margin: 16mm 15mm; }
 body { font-family: "Segoe UI", Helvetica, Arial, sans-serif; color: #121212; font-size: 10.5pt; line-height: 1.45; }
@@ -299,10 +297,9 @@ ol li { margin-bottom: 6px; }
 <h2>Business and Fulfillment Summary</h2>
 <p>Plain text for payment processor forms (also saved as <code>Business-and-Fulfillment-Summary.txt</code>):</p>
 <pre class="summary">${esc(SUMMARY)}</pre>
-<div class="note"><strong>Before submitting:</strong> ${SITE_CONFIG.supportEmail ? `support email shown on the Contact page: ${esc(SITE_CONFIG.supportEmail)}.` : 'the Contact page shows a support email only once it is set in <code>js/site-config.js</code> (<code>supportEmail</code>); it is currently empty, so add it before submitting.'} Checkout links connected: ${connected.length ? esc(connected.join(', ')) : 'none'}. ${notConnected.length ? `Not yet connected (no buy button or Terms checkbox shown until a link is added): ${esc(notConnected.join(', '))}.` : ''}</div>
 
 <h2>How delivery works, step by step</h2>
-<p>Shown for ${esc(main.product.name)} ($${main.product.price}), the product with a connected Square checkout. Every product follows the same steps; per-product evidence follows later in this document.</p>
+<p>Shown for ${esc(main.product.name)} ($${main.product.price}). Every product follows the same steps; per-product evidence follows later in this document.</p>
 <ol>
 <li><strong>Product page.</strong> The page shows the price (${esc(main.priceText)}), the delivery method and refund terms (“${esc(main.termsText)}”), what is needed to use the product, and that sounds are synthesized.${main.checkout ? ` Above the buy button the buyer must tick “I agree to the Terms of Service and Refund Policy” (both linked). Until it is ticked the button is disabled (aria-disabled=${esc(main.disabledBefore)}, no link) and a hint explains why; once ticked it links to the Square checkout (${esc(main.hrefAfter)}).` : ''}</li>
 <li><strong>Payment (on Square, not captured).</strong> The buyer pays on Square’s secure hosted checkout. Square is configured to redirect buyers after payment to the product’s order confirmation page on this site, adding its order reference (<code>orderId</code>, <code>transactionId</code>) to the address.</li>
@@ -336,13 +333,13 @@ ${results.map((r) => `<tr><td>${esc(r.product.name)}</td><td>$${r.product.price}
 <p>Each key above was produced by that product’s live order confirmation page during this capture and verified by unlocking it.</p>
 
 <h2>Products and order confirmation pages</h2>
-<table><thead><tr><th>Product</th><th>Tier</th><th>Price</th><th>Checkout</th><th>Order confirmation page (payment redirect)</th></tr></thead><tbody>
-${results.map((r) => `<tr><td>${esc(r.product.name)}</td><td>${esc(r.product.tier)}</td><td>$${r.product.price}</td><td>${r.checkout ? 'Square link connected' : 'Not connected yet'}</td><td><code>${esc(SITE + r.product.thankYouPath)}</code></td></tr>`).join('')}
+<table><thead><tr><th>Product</th><th>Tier</th><th>Price</th><th>Order confirmation page (payment redirect)</th></tr></thead><tbody>
+${results.map((r) => `<tr><td>${esc(r.product.name)}</td><td>${esc(r.product.tier)}</td><td>$${r.product.price}</td><td><code>${esc(SITE + r.product.thankYouPath)}</code></td></tr>`).join('')}
 </tbody></table>
 
 ${results.map((r) => `<section class="product"><h2>${esc(r.product.name)} — $${r.product.price}</h2>
 <p>${esc(PRODUCT_CONTENT[r.product.id].tagline)}</p>
-<p>Price shown: ${esc(r.priceText)} · Terms beside the price: “${esc(r.termsText)}” · Checkout: ${r.checkout ? 'connected (Terms agreement required)' : 'not connected yet; the page shows no buy button or checkbox until a link is added'} · Delivered ${esc(r.confirmDate)} · Example order reference: <code>${esc(r.exampleRef)}</code> · Reviewer key: <span class="key">${esc(r.key)}</span></p>
+<p>Price shown: ${esc(r.priceText)} · Terms beside the price: “${esc(r.termsText)}” · Delivered ${esc(r.confirmDate)} · Example order reference: <code>${esc(r.exampleRef)}</code> · Reviewer key: <span class="key">${esc(r.key)}</span></p>
 <div class="grid">
 ${fig(r.shots.product, 'Product page')}
 ${fig(r.shots.confirmation, 'Order confirmation with license key')}
