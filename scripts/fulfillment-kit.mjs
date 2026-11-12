@@ -292,7 +292,7 @@ code, .key { font-family: Consolas, monospace; }
 ol li { margin-bottom: 6px; }
 </style></head><body>
 <h1>Fretwell Music Lab — Fulfillment Overview</h1>
-<p class="meta">Prepared ${today.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })} from the live website ${esc(SITE)} · Products are delivered as license keys; there are no physical goods.</p>
+<p class="meta">Captured from the live website ${esc(SITE)} · Products are delivered as license keys; there are no physical goods.</p>
 
 <h2>Business and Fulfillment Summary</h2>
 <p>Plain text for payment processor forms (also saved as <code>Business-and-Fulfillment-Summary.txt</code>):</p>
