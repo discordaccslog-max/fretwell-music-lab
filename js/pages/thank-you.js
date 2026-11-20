@@ -1,6 +1,7 @@
 // Thank-you page: the order confirmation. Generates the license key in the browser and reveals it.
 import { generateKey } from '../core/license.js';
 import { PRODUCT_BY_ID } from '../products.js';
+import { ADDONS } from '../addons.js';
 import { arpeggio, isReady } from '../core/audio.js';
 import { initSoundToggles, onSoundChange, isSoundOn } from '../core/sound-ui.js';
 
@@ -9,7 +10,9 @@ const productId = section && section.getAttribute('data-product');
 const product = PRODUCT_BY_ID[productId];
 const display = document.querySelector('[data-key-display]');
 const status = document.querySelector('[data-key-status]');
-const key = generateKey(productId);
+// Course add-ons bought with this order: each combination has its own confirmation page (see build.mjs).
+const addons = (section && section.getAttribute('data-addons') || '').split(' ').filter((a) => ADDONS[a]);
+const key = generateKey(productId, { addons });
 const reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 // Payment providers add their order reference to the address when they redirect here
@@ -100,6 +103,7 @@ function confirmationText() {
     '',
     'Status: Order complete — delivered',
     `Product: ${name}`,
+    addons.length ? `Add-ons: ${addons.map((a) => ADDONS[a].name).join(', ')}` : null,
     `Date and time: ${deliveredText}`,
     orderRef ? `Order reference: ${orderRef}` : null,
     `License key: ${key}`,
@@ -108,7 +112,7 @@ function confirmationText() {
     'How to use your key:',
     `1. Go to ${abs('unlock/')}`,
     '2. Enter your license key and press Unlock.',
-    '3. Your tools open straight away in your practice room. Enter the same key on each of your own devices.',
+    product && product.tier === 'Courses' ? '3. Your course opens straight away in your practice room. Enter the same key on each of your own devices.' : '3. Your tools open straight away in your practice room. Enter the same key on each of your own devices.',
     '',
     `Terms of Service: ${abs('terms/')}`,
     `Refund Policy: ${abs('refunds/')}`,

@@ -1,5 +1,6 @@
 // Fretwell Music Lab — behaviour shared by every page: theme, menu, prices, buy buttons, contact details.
 import { PRODUCT_BY_ID } from './products.js';
+import { ADDONS, ADDON_ORDER, checkoutFor, totalFor } from './addons.js';
 import { SITE_CONFIG } from './site-config.js';
 import { hasKeys } from './core/keys.js';
 
@@ -56,57 +57,126 @@ function initPrices() {
     const p = PRODUCT_BY_ID[el.getAttribute('data-price-for')];
     if (p) el.textContent = '$' + p.price;
   });
-  const root = new URL('../', import.meta.url).href;
   document.querySelectorAll('[data-buy-for]').forEach((slot) => {
     const p = PRODUCT_BY_ID[slot.getAttribute('data-buy-for')];
     slot.textContent = '';
-    if (!p || !p.checkoutUrl) return; // no checkout connected yet: no checkbox and no button at all
-    // Buyers must agree to the Terms of Service and Refund Policy before the buy button works.
-    const agree = document.createElement('div');
-    agree.className = 'agree';
+    if (!p) return;
+    if (p.addons) initCourseBuy(slot, p);
+    else if (p.checkoutUrl) slot.append(...buyButton(p, () => p.checkoutUrl, `Buy now — $${p.price}`).nodes); // no checkout connected yet: no checkbox and no button at all
+  });
+}
+
+const siteRoot = new URL('../', import.meta.url).href;
+
+/**
+ * The Terms agreement checkbox, the buy button and its hint. Buyers must agree to the Terms of Service
+ * and Refund Policy before the button works. getUrl() returns the checkout link for the current choice.
+ */
+function buyButton(p, getUrl, label) {
+  const agree = document.createElement('div');
+  agree.className = 'agree';
+  const box = document.createElement('input');
+  box.type = 'checkbox';
+  box.id = 'agree-' + p.id;
+  const lab = document.createElement('label');
+  lab.htmlFor = box.id;
+  lab.append('I agree to the ', policyLink(siteRoot + 'terms/', 'Terms of Service'), ' and ', policyLink(siteRoot + 'refunds/', 'Refund Policy'));
+  agree.append(box, lab);
+  const a = document.createElement('a');
+  a.className = 'btn btn-buy';
+  a.rel = 'noopener';
+  a.textContent = label;
+  a.setAttribute('role', 'link');
+  a.tabIndex = 0;
+  const hint = document.createElement('p');
+  hint.className = 'agree-hint';
+  hint.id = 'agree-hint-' + p.id;
+  hint.setAttribute('aria-live', 'polite');
+  a.setAttribute('aria-describedby', hint.id);
+  const sync = () => {
+    if (box.checked) {
+      a.href = getUrl();
+      a.removeAttribute('aria-disabled');
+      hint.textContent = 'You will continue to our payment provider’s secure checkout.';
+      hint.classList.remove('is-needed');
+    } else {
+      a.removeAttribute('href');
+      a.setAttribute('aria-disabled', 'true');
+      hint.textContent = 'Tick the box above to agree to the Terms of Service and Refund Policy before checkout.';
+    }
+  };
+  a.addEventListener('click', (e) => {
+    if (box.checked) return;
+    e.preventDefault();
+    hint.classList.add('is-needed');
+    box.focus();
+  });
+  a.addEventListener('keydown', (e) => {
+    if (!box.checked && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); a.click(); }
+  });
+  box.addEventListener('change', sync);
+  sync();
+  return { nodes: [agree, a, hint], button: a, sync };
+}
+
+/** Course buy card: optional add-on checkboxes, a running total, then the agreement and buy button. */
+function initCourseBuy(slot, p) {
+  const offered = ADDON_ORDER.filter((id) => p.addons[id] !== undefined);
+  const fs = document.createElement('fieldset');
+  fs.className = 'addon-pick';
+  const legend = document.createElement('legend');
+  legend.textContent = 'Add-ons (optional)';
+  fs.append(legend);
+  const boxes = offered.map((id) => {
+    const row = document.createElement('div');
+    row.className = 'addon-opt';
     const box = document.createElement('input');
     box.type = 'checkbox';
-    box.id = 'agree-' + p.id;
-    const label = document.createElement('label');
-    label.htmlFor = box.id;
-    label.append('I agree to the ', policyLink(root + 'terms/', 'Terms of Service'), ' and ', policyLink(root + 'refunds/', 'Refund Policy'));
-    agree.append(box, label);
-    const a = document.createElement('a');
-    a.className = 'btn btn-buy';
-    a.rel = 'noopener';
-    a.textContent = `Buy now — $${p.price}`;
-    a.setAttribute('role', 'link');
-    a.tabIndex = 0;
-    const hint = document.createElement('p');
-    hint.className = 'agree-hint';
-    hint.id = 'agree-hint-' + p.id;
-    hint.setAttribute('aria-live', 'polite');
-    a.setAttribute('aria-describedby', hint.id);
-    const sync = () => {
-      if (box.checked) {
-        a.href = p.checkoutUrl;
-        a.removeAttribute('aria-disabled');
-        hint.textContent = 'You will continue to our payment provider’s secure checkout.';
-        hint.classList.remove('is-needed');
-      } else {
-        a.removeAttribute('href');
-        a.setAttribute('aria-disabled', 'true');
-        hint.textContent = 'Tick the box above to agree to the Terms of Service and Refund Policy before checkout.';
-      }
-    };
-    a.addEventListener('click', (e) => {
-      if (box.checked) return;
-      e.preventDefault();
-      hint.classList.add('is-needed');
-      box.focus();
-    });
-    a.addEventListener('keydown', (e) => {
-      if (!box.checked && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); a.click(); }
-    });
-    box.addEventListener('change', sync);
-    sync();
-    slot.append(agree, a, hint);
+    box.id = `addon-${p.id}-${id}`;
+    box.value = id;
+    const lab = document.createElement('label');
+    lab.htmlFor = box.id;
+    const name = document.createElement('span');
+    name.className = 'addon-name';
+    name.textContent = ADDONS[id].name;
+    const price = document.createElement('span');
+    price.className = 'addon-price';
+    price.textContent = `+$${p.addons[id]}`;
+    const desc = document.createElement('span');
+    desc.className = 'addon-desc';
+    desc.textContent = ADDONS[id].text;
+    lab.append(name, price, desc);
+    row.append(box, lab);
+    fs.append(row);
+    return box;
   });
+  const total = document.createElement('p');
+  total.className = 'addon-total';
+  total.setAttribute('aria-live', 'polite');
+  slot.append(fs, total);
+  const chosen = () => boxes.filter((b) => b.checked).map((b) => b.value);
+  const anyLink = !!p.checkoutUrl || Object.values(p.addonCheckoutUrls || {}).some(Boolean);
+  let buy = null;
+  const missing = document.createElement('p');
+  missing.className = 'agree-hint';
+  missing.textContent = 'This combination of add-ons can’t be bought yet. Choose a different combination.';
+  if (anyLink) {
+    buy = buyButton(p, () => checkoutFor(p, chosen()), '');
+    slot.append(...buy.nodes, missing);
+  }
+  const update = () => {
+    const sum = totalFor(p, chosen());
+    total.innerHTML = '';
+    total.append('Total ', Object.assign(document.createElement('strong'), { textContent: '$' + sum }), ' USD');
+    if (!buy) return;
+    const url = checkoutFor(p, chosen());
+    buy.button.textContent = `Buy now — $${sum}`;
+    buy.nodes.forEach((n) => { n.hidden = !url; });
+    missing.hidden = !!url;
+    buy.sync();
+  };
+  boxes.forEach((b) => b.addEventListener('change', update));
+  update();
 }
 
 function policyLink(href, text) {

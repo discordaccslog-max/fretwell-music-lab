@@ -7,6 +7,8 @@
 // The alphabet leaves out characters that are easy to confuse: 0, O, 1, I and L.
 // Everything here runs in the browser; there is no server and no database.
 
+import { ADDONS, ADDON_ORDER } from '../addons.js';
+
 export const ALPHABET = '23456789ABCDEFGHJKMNPQRSTUVWXYZ'; // 31 characters
 const BASE = ALPHABET.length;
 const PREFIX = 'FRET';
@@ -14,6 +16,12 @@ const SALT = 'fretwell-music-lab/keys/v1';
 
 // Product codes. FB (Foundations Bundle) unlocks all five Foundations tools.
 // AA is the owner's all-access code: it unlocks every tool and has no product page or thank-you page.
+const FOUNDATION_TOOLS = ['note-reader', 'interval-trainer', 'scale-explorer', 'chord-builder', 'rhythm-lab'];
+const ALL_TOOLS = [...FOUNDATION_TOOLS, 'progression-lab', 'jazz-harmony', 'melodic-dictation', 'atelier'];
+
+// Course codes (course: true) open a guided course. For course keys the first random character also
+// records the add-ons bought (see ADDONS in ../addons.js): it is ALPHABET[sum of the add-on bits].
+// Two courses also include full access to tools.
 export const PRODUCT_CODES = {
   NR: { product: 'note-reader', tools: ['note-reader'] },
   ET: { product: 'interval-trainer', tools: ['interval-trainer'] },
@@ -25,7 +33,32 @@ export const PRODUCT_CODES = {
   JZ: { product: 'jazz-harmony', tools: ['jazz-harmony'] },
   MD: { product: 'melodic-dictation', tools: ['melodic-dictation'] },
   AT: { product: 'atelier', tools: ['atelier'] },
-  AA: { product: 'all-access', label: 'Every tool (administrator access)', tools: ['note-reader', 'interval-trainer', 'scale-explorer', 'chord-builder', 'rhythm-lab', 'progression-lab', 'jazz-harmony', 'melodic-dictation', 'atelier'] },
+  AA: { product: 'all-access', label: 'Every tool (administrator access)', tools: ALL_TOOLS },
+  TC: { product: 'treble-clef-sprint', course: true, tools: [] },
+  BC: { product: 'bass-clef-sprint', course: true, tools: [] },
+  FM: { product: 'fretboard-map', course: true, tools: [] },
+  PK: { product: 'piano-keys-fluency', course: true, tools: [] },
+  EB: { product: 'interval-ear-bootcamp', course: true, tools: [] },
+  ES: { product: 'major-minor-ear', course: true, tools: [] },
+  SW: { product: 'scale-workout-guitar', course: true, tools: [] },
+  MM: { product: 'modes-made-clear', course: true, tools: [] },
+  PB: { product: 'pentatonic-blues-path', course: true, tools: [] },
+  TR: { product: 'triads-everywhere', course: true, tools: [] },
+  SE: { product: 'seventh-chord-essentials', course: true, tools: [] },
+  RR: { product: 'rhythm-reading-foundations', course: true, tools: [] },
+  QM: { product: 'odd-meter-workshop', course: true, tools: [] },
+  ST: { product: 'steady-time-builder', course: true, tools: [] },
+  DH: { product: 'diatonic-harmony-course', course: true, tools: [] },
+  FP: { product: 'four-part-writing', course: true, tools: [] },
+  HP: { product: 'hearing-progressions', course: true, tools: [] },
+  JC: { product: 'jazz-chord-spelling', course: true, tools: [] },
+  TF: { product: 'two-five-one-workout', course: true, tools: [] },
+  JE: { product: 'jazz-ear-extensions', course: true, tools: [] },
+  DS: { product: 'melodic-dictation-starter', course: true, tools: [] },
+  DM: { product: 'minor-key-dictation', course: true, tools: [] },
+  AE: { product: 'advanced-ear-intensive', course: true, tools: [] },
+  CF: { product: 'complete-foundations-course', course: true, tools: FOUNDATION_TOOLS },
+  CM: { product: 'complete-musicianship-program', course: true, tools: ALL_TOOLS },
 };
 
 export const CODE_FOR_PRODUCT = Object.fromEntries(Object.entries(PRODUCT_CODES).map(([c, v]) => [v.product, c]));
@@ -75,11 +108,18 @@ function defaultRandom(arr) {
   return arr;
 }
 
-/** Create a new key for a product id (e.g. "interval-trainer") or product code (e.g. "ET"). */
-export function generateKey(productOrCode, getRandomValues = defaultRandom) {
+/**
+ * Create a new key for a product id (e.g. "interval-trainer") or product code (e.g. "ET").
+ * For a course, pass the add-on ids bought: generateKey("treble-clef-sprint", { addons: ["planner"] }).
+ */
+export function generateKey(productOrCode, { addons = [], random: getRandomValues = defaultRandom } = {}) {
   const code = PRODUCT_CODES[productOrCode] ? productOrCode : CODE_FOR_PRODUCT[productOrCode];
   if (!code) throw new Error('Unknown product ' + productOrCode);
-  const random = randomChars(10, getRandomValues);
+  let random = randomChars(10, getRandomValues);
+  if (PRODUCT_CODES[code].course) {
+    const mask = addons.reduce((m, id) => m | (ADDONS[id] ? ADDONS[id].bit : 0), 0);
+    random = ALPHABET[mask] + random.slice(1);
+  }
   return `${PREFIX}-${code}-${random.slice(0, 5)}-${random.slice(5)}-${checksum(code, random)}`;
 }
 
@@ -97,7 +137,7 @@ export function formatKey(input) {
 }
 
 /**
- * Check a key. Returns { ok: true, code, product, tools, key } or { ok: false, reason, message }.
+ * Check a key. Returns { ok: true, code, product, course, addons, tools, key } or { ok: false, reason, message }.
  * Messages are written for buyers.
  */
 export function validateKey(input) {
@@ -121,7 +161,13 @@ export function validateKey(input) {
   if (!PRODUCT_CODES[code]) return { ok: false, reason: 'product', message: 'We don’t recognise the product part of that key (the two letters after FRET). Check it against the key you saved.' };
   if (checksum(code, random) !== sum) return { ok: false, reason: 'checksum', message: 'That key doesn’t add up. One or more characters may be mistyped — check it against the key you saved.' };
   const info = PRODUCT_CODES[code];
-  return { ok: true, code, product: info.product, label: info.label || null, tools: info.tools.slice(), key: formatKey(c) };
+  let addons = [];
+  if (info.course) {
+    const mask = ALPHABET.indexOf(random[0]);
+    if (mask > 15) return { ok: false, reason: 'checksum', message: 'That key doesn’t add up. One or more characters may be mistyped — check it against the key you saved.' };
+    addons = ADDON_ORDER.filter((id) => mask & ADDONS[id].bit);
+  }
+  return { ok: true, code, product: info.product, course: !!info.course, addons, label: info.label || null, tools: info.tools.slice(), key: formatKey(c) };
 }
 
 /** Unique tool ids unlocked by a list of keys. */

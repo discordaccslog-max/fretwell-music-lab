@@ -10,11 +10,14 @@
 import { mkdirSync, writeFileSync, readFileSync, rmSync, readdirSync, renameSync, existsSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
-import { PRODUCTS } from '../js/products.js';
+import { PRODUCTS as ALL_PRODUCTS } from '../js/products.js';
 import { PRODUCT_CONTENT } from './content-products.mjs';
 import { TOOLS } from '../js/app/registry.js';
 import { validateKey, PRODUCT_CODES } from '../js/core/license.js';
 import { SITE_CONFIG } from '../js/site-config.js';
+
+// Courses are not part of the evidence kit yet; it covers the ten tool products only.
+const PRODUCTS = ALL_PRODUCTS.filter((p) => p.tier !== 'Courses');
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const SITE = (process.env.SITE_URL || 'https://fretwell-music-lab.vercel.app/').replace(/\/?$/, '/');

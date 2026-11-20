@@ -3,6 +3,7 @@ import { segmentedKeyInput } from '../core/key-input.js';
 import { addKey } from '../core/keys.js';
 import { validateKey } from '../core/license.js';
 import { PRODUCT_BY_ID } from '../products.js';
+import { ADDONS } from '../addons.js';
 import { createChordAnim } from '../core/chord-anim.js';
 import { initSoundToggles, isSoundOn } from '../core/sound-ui.js';
 import { unlock as unlockAudio } from '../core/audio.js';
@@ -39,7 +40,8 @@ form.addEventListener('submit', async (e) => {
   if (!saved.ok) { errorEl.textContent = saved.message; return; }
   input.mark('ok');
   const p = PRODUCT_BY_ID[v.product];
-  const name = p ? p.name : (v.label || 'Your tools');
+  const base = p ? p.name : (v.label || 'Your tools');
+  const name = v.addons && v.addons.length ? `${base} (with ${v.addons.map((x) => ADDONS[x].name.toLowerCase()).join(', ')})` : base;
   const names = v.product === 'foundations-bundle' ? 'all five Foundations tools' : v.product === 'all-access' ? 'every tool' : name;
   const verb = v.product === 'foundations-bundle' ? 'are' : 'is';
   msg.textContent = saved.already ? `This key was already saved on this device. ${name} is in your practice room. Opening it now…` : `Key accepted. ${names[0].toUpperCase() + names.slice(1)} ${verb} now in your practice room. Opening it now…`;
@@ -48,7 +50,7 @@ form.addEventListener('submit', async (e) => {
   anim.resolve({ sound: isSoundOn() });
   success.focus({ preventScroll: true });
   document.querySelectorAll('.nav-room').forEach((li) => { li.hidden = false; });
-  redirectTimer = setTimeout(() => { location.href = '../practice/'; }, 2600);
+  redirectTimer = setTimeout(() => { location.href = '../practice/' + (v.course ? `#/course/${v.product}` : ''); }, 2600);
 });
 
 document.querySelector('[data-another-key]').addEventListener('click', () => {

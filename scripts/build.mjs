@@ -6,8 +6,13 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { PRODUCTS, PRODUCT_BY_ID } from '../js/products.js';
 import { PRODUCT_CONTENT } from './content-products.mjs';
-import { FAQ, ABOUT, REFUNDS, DELIVERY, DISCLAIMER, TERMS, PRIVACY, ACCESSIBILITY, LAST_UPDATED, UPDATED_NOV_11 } from './content-pages.mjs';
+import { FAQ, ABOUT, REFUNDS, DELIVERY, DISCLAIMER, TERMS, PRIVACY, ACCESSIBILITY, LAST_UPDATED, UPDATED_NOV_20 } from './content-pages.mjs';
 import { art, LOGO } from '../js/core/art.js';
+import { COURSE_BY_ID, courseTools, describeLesson, exerciseName, TOOL_NAMES } from '../js/courses.js';
+import { ADDONS, ADDON_ORDER, allCombos, comboPath } from '../js/addons.js';
+
+const TOOL_PRODUCTS = PRODUCTS.filter((p) => p.tier !== 'Courses');
+const COURSE_PRODUCTS = PRODUCTS.filter((p) => p.tier === 'Courses');
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 // The site's primary address, used for canonical links, Open Graph tags, the sitemap and robots.txt.
@@ -71,6 +76,7 @@ function header(r) {
       <ul>
         <li><a href="${r}#foundations">Foundations</a></li>
         <li><a href="${r}#studio">Studio Editions</a></li>
+        <li><a href="${r}#courses">Courses</a></li>
         <li><a href="${r}about/">About</a></li>
         <li><a href="${r}faq/">FAQ</a></li>
         <li class="nav-room" hidden><a href="${r}practice/">Practice room</a></li>
@@ -106,13 +112,14 @@ function footer(r) {
     <nav class="footer-nav" aria-label="Products">
       <h2 class="footer-h">Tools</h2>
       <ul>
-        ${PRODUCTS.map((p) => `<li><a href="${r}${p.pagePath}">${esc(p.shortName)}</a></li>`).join('\n        ')}
+        ${TOOL_PRODUCTS.map((p) => `<li><a href="${r}${p.pagePath}">${esc(p.shortName)}</a></li>`).join('\n        ')}
       </ul>
     </nav>
     <nav class="footer-nav" aria-label="Site">
       <h2 class="footer-h">Site</h2>
       <ul>
         <li><a href="${r}">Home</a></li>
+        <li><a href="${r}#courses">Courses</a></li>
         <li><a href="${r}about/">About</a></li>
         <li><a href="${r}faq/">FAQ</a></li>
         <li><a href="${r}unlock/">Have a key?</a></li>
@@ -155,6 +162,20 @@ function tile(p, { large = false } = {}) {
     <h3 class="tile-title">${esc(p.shortName)}</h3>
     <p class="tile-text">${esc(c.tagline)}</p>
     <p class="tile-price"><span data-price-for="${p.id}">${priceOf(p.id)}</span></p>
+  </div>
+</a>`;
+}
+
+function courseTile(p) {
+  const c = COURSE_BY_ID[p.id];
+  const t = PRODUCT_CONTENT[c.primary];
+  return `<a class="tile tile--${t.color} tile--course" href="{{r}}${p.pagePath}">
+  <div class="tile-art">${art(t.art)}</div>
+  <div class="tile-body">
+    <p class="tile-tier">Course · ${c.level} · ${c.lessons.length} lessons</p>
+    <h3 class="tile-title">${esc(p.shortName)}</h3>
+    <p class="tile-text">${esc(c.tagline)}</p>
+    <p class="tile-price"><span data-price-for="${p.id}">${priceOf(p.id)}</span> <span class="tile-addons">+ optional add-ons</span></p>
   </div>
 </a>`;
 }
@@ -277,6 +298,21 @@ function homePage() {
   </div>
 </section>
 
+<section class="section tier courses" id="courses" aria-labelledby="courses-title">
+  <div class="wrap">
+    <header class="tier-head">
+      <p class="tier-label">Tier three</p>
+      <h2 id="courses-title" class="tier-title">Courses</h2>
+      <p class="tier-text">Guided courses built on the tools. Each one is a sequence of lessons with set exercises and a pass mark, so you always know what to practise next. Add a practice planner, a printable guide, bonus lessons or a progress export if you want them.</p>
+    </header>
+    ${staffRule}
+    ${['Beginner', 'Intermediate', 'Advanced'].map((lvl) => `<h3 class="course-level">${lvl}</h3>
+    <div class="tiles">
+      ${COURSE_PRODUCTS.filter((p) => COURSE_BY_ID[p.id].level === lvl).map(courseTile).join('\n')}
+    </div>`).join('\n')}
+  </div>
+</section>
+
 <section class="section how" aria-labelledby="how-title">
   <div class="wrap">
     <h2 id="how-title" class="h-staff">How buying and unlocking work</h2>
@@ -394,22 +430,118 @@ function productPage(p) {
   });
 }
 
+/* ----------------------------------------------------------------- courses */
+
+function lessonItem(l) {
+  return `<li><span class="lesson-t">${esc(l.t)}</span><span class="lesson-d">${esc(TOOL_NAMES[l.tool])} · ${esc(exerciseName(l))} · ${esc(describeLesson(l))} · ${l.s.sessionLength} questions, pass at ${l.pass}%</span></li>`;
+}
+
+function coursePage(p) {
+  const c = COURSE_BY_ID[p.id];
+  const t = PRODUCT_CONTENT[c.primary];
+  const r = '{{r}}';
+  const tools = courseTools(c);
+  const ear = tools.some((id) => PRODUCT_CONTENT[id].ear);
+  const units = [];
+  for (const l of c.lessons) {
+    if (!units.length || units[units.length - 1].name !== (l.u || '')) units.push({ name: l.u || '', lessons: [] });
+    units[units.length - 1].lessons.push(l);
+  }
+  const offered = ADDON_ORDER.filter((id) => p.addons[id] !== undefined);
+  const included = c.includesTools && c.includesTools.length
+    ? `<section class="p-section"><h2>Full tool access included</h2><p>Your key also unlocks ${c.includesTools.length === 9 ? 'all nine tools' : 'all five Foundations tools'} in full, so you can practise with any settings between lessons:</p><ul class="tick-list">${c.includesTools.map((id) => `<li><a href="${r}${PRODUCT_BY_ID[id].pagePath}">${esc(PRODUCT_BY_ID[id].name)}</a></li>`).join('')}</ul></section>`
+    : `<section class="p-section"><h2>Tools used in the lessons</h2><p>Lessons open these tools with the lesson’s settings. The course does not include free use of the tools outside its lessons; each tool is also sold on its own.</p><ul class="tick-list">${tools.map((id) => `<li><a href="${r}${PRODUCT_BY_ID[id].pagePath}">${esc(PRODUCT_BY_ID[id].name)}</a></li>`).join('')}</ul></section>`;
+  const body = `
+<article class="product product--${t.color} product--course">
+  <header class="p-hero">
+    <div class="wrap p-hero-grid">
+      <div class="p-hero-copy">
+        <p class="eyebrow"><a href="${r}#courses">Course</a> · ${c.level}</p>
+        <h1 class="p-title">${esc(p.name)}</h1>
+        <p class="lede">${esc(c.tagline)}</p>
+      </div>
+      <div class="p-hero-art">${art(t.art)}</div>
+    </div>
+  </header>
+  <div class="wrap p-layout">
+    <div class="p-main">
+      <section class="p-section"><h2>About this course</h2><p>${esc(c.intro)}</p>
+        <ul class="tick-list">
+          <li>${c.lessons.length} lessons${units.length > 1 ? ` in ${units.length} units` : ''}${p.addons.bonus !== undefined ? `, plus ${c.bonus.length} bonus lessons with the bonus add-on` : ''}</li>
+          <li>Level: ${c.level}</li>
+          <li>Each lesson has a set number of questions and a pass mark; repeat any lesson as often as you like</li>
+          <li>Your lesson results are saved in your browser and can be moved to another device with a backup code</li>
+        </ul>
+      </section>
+      <section class="p-section"><h2>Lessons</h2>
+        ${units.map((u) => `${u.name ? `<h3 class="unit-h">${esc(u.name)}</h3>` : ''}<ol class="lesson-list" start="${c.lessons.indexOf(u.lessons[0]) + 1}">${u.lessons.map(lessonItem).join('')}</ol>`).join('')}
+      </section>
+      <section class="p-section"><h2>Optional add-ons</h2><p>Choose add-ons in the box beside the price before you go to checkout. They are included in your license key; nothing extra is posted or emailed.</p>
+        <dl class="ex-list">${offered.map((id) => `<div><dt>${esc(ADDONS[id].name)} · ${p.addons[id]}</dt><dd>${esc(ADDONS[id].text)}${id === 'bonus' ? ` In this course: ${c.bonus.map((b) => esc(b.t)).join('; ')}.` : ''}</dd></div>`).join('')}</dl>
+      </section>
+      ${included}
+      <section class="p-section demo-section"><h2>Try it</h2><p>A short interactive demo of ${esc(PRODUCT_BY_ID[c.primary].name)}, built from the same code the lessons use.</p><div class="demo" data-demo="${t.demo}"><noscript><p>The demo needs JavaScript turned on.</p></noscript></div></section>
+      <section class="p-section p-who">
+        <div><h2>Who it’s for</h2><ul class="tick-list">${c.forWho.map((x) => `<li>${esc(x)}</li>`).join('')}</ul></div>
+        <div><h2>Who it isn’t for</h2><ul class="dash-list">${c.notFor.map((x) => `<li>${esc(x)}</li>`).join('')}</ul></div>
+      </section>
+      <section class="p-section"><h2>What you need</h2><ul class="tick-list">
+        <li>A modern web browser on a computer, tablet or phone</li>
+        <li>Speakers or headphones</li>
+        ${ear ? '<li>The ability to hear audio — this course includes ear training that depends on listening</li>' : ''}
+      </ul>
+      <p class="synth-note"><strong>About the sound:</strong> all instrument sounds are synthesized in your browser. They are not recordings of real instruments.</p></section>
+    </div>
+    <aside class="p-buy" aria-label="Price and purchase">
+      <div class="buy-card">
+        <p class="buy-name">${esc(p.shortName)}</p>
+        <p class="price"><span data-price-for="${p.id}">${priceOf(p.id)}</span> <span class="price-cur">USD</span></p>
+        <p class="price-terms">Instant access with a license key · <a href="${r}refunds/">14-day refund policy</a> · Applicable taxes are shown at checkout</p>
+        <div class="buy-slot" data-buy-for="${p.id}"></div>
+        <ul class="buy-facts">
+          <li>One-time purchase, no subscription</li>
+          <li>No account or password</li>
+          <li>Computer, tablet and phone</li>
+          <li>Sounds are synthesized, not recorded</li>
+        </ul>
+        <p class="buy-key">Already bought it? <a href="${r}unlock/">Enter your key</a></p>
+      </div>
+    </aside>
+  </div>
+</article>`;
+  page({
+    path: p.pagePath,
+    title: `${p.name} — Course — Fretwell Music Lab`,
+    description: `${c.tagline} A ${c.lessons.length}-lesson ${c.level.toLowerCase()} course from Fretwell Music Lab, ${p.price}.`.slice(0, 300),
+    body,
+    scripts: ['js/pages/product.js'],
+    bodyClass: 'page-product',
+  });
+}
+
 /* ------------------------------------------------------------- thank-you */
 
 function thankYouPage(p) {
+  if (p.addons) { allCombos(Object.keys(p.addons)).forEach((ids) => thankYouVariant(p, ids)); return; }
+  thankYouVariant(p, []);
+}
+
+function thankYouVariant(p, addons) {
   const tools = p.id === 'foundations-bundle'
     ? 'Note Reader, Interval Ear Trainer, Scale & Mode Explorer, Chord Builder & Ear Trainer and Rhythm Lab'
     : p.name;
+  const addonNames = addons.map((a) => ADDONS[a].name).join(', ');
   const body = `
-<section class="thanks" data-product="${p.id}">
+<section class="thanks" data-product="${p.id}"${p.addons ? ` data-addons="${addons.join(' ')}"` : ''}>
   <div class="wrap thanks-grid">
     <div class="thanks-copy">
       <p class="eyebrow">Order confirmation</p>
       <h1 class="display-sm">Order complete. Your product is delivered.</h1>
-      <p class="lede">Thank you for your purchase. Your license key for <strong>${esc(tools)}</strong> is ready to use now.</p>
+      <p class="lede">Thank you for your purchase. Your license key for <strong>${esc(tools)}</strong>${addons.length ? ` with ${esc(addonNames.toLowerCase())}` : ''} is ready to use now.</p>
       <dl class="confirm-details" aria-label="Order details">
         <div><dt>Status</dt><dd>Complete — delivered</dd></div>
         <div><dt>Product</dt><dd>${esc(p.name)}</dd></div>
+        ${p.addons ? `<div><dt>Add-ons</dt><dd>${addons.length ? esc(addonNames) : 'None'}</dd></div>` : ''}
         <div><dt>Date and time</dt><dd data-confirm-date>Shown when this page opens</dd></div>
         <div data-order-row hidden><dt>Order reference</dt><dd data-order-number></dd></div>
         <div><dt>Delivery</dt><dd>Digital license key, shown on this page. No physical shipment.</dd></div>
@@ -428,7 +560,7 @@ function thankYouPage(p) {
       <div class="key-reminder">
         <p><strong>Save this key now.</strong> Copy it into a notes app or password manager, or save the confirmation. You will need it to open your tools on another device or browser.</p>
       </div>
-      <a class="btn btn-vermilion btn-lg" href="{{r}}unlock/" data-open-tools>Open my tools</a>
+      <a class="btn btn-vermilion btn-lg" href="{{r}}unlock/" data-open-tools>Open my ${p.addons ? 'course' : 'tools'}</a>
     </div>
   </div>
   <div class="wrap">
@@ -436,7 +568,7 @@ function thankYouPage(p) {
     <h2 class="h-staff thanks-h">How to use your key</h2>
     <ol class="steps">
       <li><span class="step-n" aria-hidden="true">1</span><h3>Save your key</h3><p>Copy it or save the confirmation before you leave this page.</p></li>
-      <li><span class="step-n" aria-hidden="true">2</span><h3>Open your tools</h3><p>“Open my tools” takes you to the unlock page with your key filled in. Press Unlock and your tools open in your practice room.</p></li>
+      <li><span class="step-n" aria-hidden="true">2</span><h3>Open your ${p.addons ? 'course' : 'tools'}</h3><p>“Open my ${p.addons ? 'course' : 'tools'}” takes you to the unlock page with your key filled in. Press Unlock and your ${p.addons ? 'course opens' : 'tools open'} in your practice room.</p></li>
       <li><span class="step-n" aria-hidden="true">3</span><h3>Practise anywhere</h3><p>Enter the same key on your other devices. Install the practice room to use it offline.</p></li>
     </ol>
     <p class="thanks-policies">Your purchase is covered by our <a href="{{r}}terms/">Terms of Service</a>, <a href="{{r}}refunds/">Refund Policy</a> and <a href="{{r}}delivery/">Delivery Policy</a>.</p>
@@ -445,8 +577,8 @@ function thankYouPage(p) {
   </div>
 </section>`;
   page({
-    path: p.thankYouPath,
-    title: `Order confirmation — ${p.shortName} — Fretwell Music Lab`,
+    path: p.thankYouPath + comboPath(addons),
+    title: `Order confirmation — ${p.shortName}${addons.length ? ` with ${addonNames.toLowerCase()}` : ''} — Fretwell Music Lab`,
     description: `Order confirmation and license key for ${p.name}.`,
     body,
     noindex: true,
@@ -693,18 +825,19 @@ ${footer(r)}
 /* -------------------------------------------------------------- run build */
 
 homePage();
-PRODUCTS.forEach(productPage);
+TOOL_PRODUCTS.forEach(productPage);
+COURSE_PRODUCTS.forEach(coursePage);
 PRODUCTS.forEach(thankYouPage);
 unlockPage();
 practicePage();
 textPage({ path: 'about/', title: 'About — Fretwell Music Lab', h1: 'About Fretwell Music Lab', description: 'What Fretwell Music Lab makes and why: browser-based theory and ear-training tools with generated exercises and synthesized sound.', html: ABOUT, eyebrow: 'About' });
 faqPage();
 contactPage();
-textPage({ path: 'terms/', title: 'Terms of Service — Fretwell Music Lab', h1: 'Terms of Service', description: 'The terms that apply when you use the Fretwell Music Lab website and buy and use its products.', html: TERMS, dated: true, eyebrow: 'Policies', updated: UPDATED_NOV_11 });
+textPage({ path: 'terms/', title: 'Terms of Service — Fretwell Music Lab', h1: 'Terms of Service', description: 'The terms that apply when you use the Fretwell Music Lab website and buy and use its products.', html: TERMS, dated: true, eyebrow: 'Policies', updated: UPDATED_NOV_20 });
 textPage({ path: 'privacy/', title: 'Privacy Policy — Fretwell Music Lab', h1: 'Privacy Policy', description: 'No cookies, no analytics, no trackers. Your keys, progress and settings stay in your browser. How order information is handled and your rights.', html: PRIVACY, dated: true, eyebrow: 'Policies' });
-textPage({ path: 'refunds/', title: 'Refund Policy — Fretwell Music Lab', h1: 'Refund Policy', description: 'Full refund on any Fretwell Music Lab purchase within 14 days, no reason required.', html: REFUNDS, dated: true, eyebrow: 'Policies' });
-textPage({ path: 'delivery/', title: 'Delivery Policy — Fretwell Music Lab', h1: 'Delivery Policy', description: 'All products are digital. Your license key appears immediately after payment and unlocks your tools on any device.', html: DELIVERY, dated: true, eyebrow: 'Policies', updated: UPDATED_NOV_11 });
-textPage({ path: 'disclaimer/', title: 'Disclaimer — Fretwell Music Lab', h1: 'Disclaimer', description: 'Fretwell Music Lab tools are practice aids, not lessons. No specific results are promised. Sounds are synthesized.', html: DISCLAIMER, dated: true, eyebrow: 'Policies' });
+textPage({ path: 'refunds/', title: 'Refund Policy — Fretwell Music Lab', h1: 'Refund Policy', description: 'Full refund on any Fretwell Music Lab purchase within 14 days, no reason required.', html: REFUNDS, dated: true, eyebrow: 'Policies', updated: UPDATED_NOV_20 });
+textPage({ path: 'delivery/', title: 'Delivery Policy — Fretwell Music Lab', h1: 'Delivery Policy', description: 'All products are digital. Your license key appears immediately after payment and unlocks your tools on any device.', html: DELIVERY, dated: true, eyebrow: 'Policies', updated: UPDATED_NOV_20 });
+textPage({ path: 'disclaimer/', title: 'Disclaimer — Fretwell Music Lab', h1: 'Disclaimer', description: 'Fretwell Music Lab tools and courses are practice aids, not tuition. No specific results are promised. Sounds are synthesized.', html: DISCLAIMER, dated: true, eyebrow: 'Policies', updated: UPDATED_NOV_20 });
 textPage({ path: 'accessibility/', title: 'Accessibility — Fretwell Music Lab', h1: 'Accessibility', description: 'Keyboard operation, shortcuts, contrast, a larger-interface setting and other accessibility features of Fretwell Music Lab, and known limitations.', html: ACCESSIBILITY, dated: true, eyebrow: 'Policies' });
 notFoundPage();
 

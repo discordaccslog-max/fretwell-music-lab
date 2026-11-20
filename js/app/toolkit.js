@@ -314,14 +314,18 @@ const TABS = [['practice', 'Practice'], ['reference', 'Reference'], ['progress',
 
 /**
  * Mount a tool definition. def: { id, exercises, defaults, settingsSchema, walkthrough, createQuestion,
- * renderReference, itemLabel, shortcuts }. ctx: { meta, prefs, setRoute }.
+ * renderReference, itemLabel, shortcuts }. ctx: { meta, prefs, setRoute, lesson }.
+ * ctx.lesson runs the tool as a course lesson: { title, context, goal, settings, pass, backHref, backLabel,
+ * best, onFinish({ total, correct }) => { passed, passedNow, next } }. Its settings are fixed and not saved.
  */
 export function mountTool(container, def, ctx) {
   const meta = ctx.meta;
-  let settings = store.getToolSettings(def.id, def.defaults);
+  const lesson = ctx.lesson || null;
+  const tabs = lesson ? TABS.filter(([t]) => t === 'practice' || t === 'reference') : TABS;
+  let settings = lesson ? { ...def.defaults, ...lesson.settings } : store.getToolSettings(def.id, def.defaults);
   if (!def.exercises.some((e) => e.id === settings.exercise)) settings.exercise = def.exercises[0].id;
   let prefs = store.getPrefs();
-  let tab = TABS.some(([t]) => t === ctx.tab) ? ctx.tab : 'practice';
+  let tab = tabs.some(([t]) => t === ctx.tab) ? ctx.tab : 'practice';
   let mode = 'start';
   let session = null;
   let question = null;
@@ -349,21 +353,23 @@ export function mountTool(container, def, ctx) {
   const shortcutsBtn = h('button', { type: 'button', class: 'btn btn-sm btn-outline', 'aria-keyshortcuts': '?' }, 'Shortcuts ', kbd('?'));
   const guideBtn = h('button', { type: 'button', class: 'btn btn-sm btn-outline' }, 'How it works');
   const head = h('header', { class: 'tool-head' },
-    h('a', { class: 'tool-back', href: '#/' }, '← Practice room'),
+    h('a', { class: 'tool-back', href: lesson ? lesson.backHref : '#/' }, '← ' + (lesson ? lesson.backLabel : 'Practice room')),
     h('div', { class: 'tool-title-row' },
       toolArt(meta),
-      h('h1', { class: 'tool-title', tabindex: '-1' }, meta.full)),
+      h('div', {},
+        lesson ? h('p', { class: 'tool-context' }, lesson.context) : null,
+        h('h1', { class: 'tool-title', tabindex: '-1' }, lesson ? lesson.title : meta.full))),
     h('div', { class: 'tool-head-actions' }, guideBtn, shortcutsBtn, reportLink));
   const tabsEl = h('div', { class: 'tool-tabs', role: 'tablist', 'aria-label': meta.name + ' sections' });
   const panel = h('div', { class: 'tool-panel', role: 'tabpanel', tabindex: '-1' });
-  const tabButtons = TABS.map(([id, label]) => {
+  const tabButtons = tabs.map(([id, label]) => {
     const b = h('button', { type: 'button', role: 'tab', class: 'tool-tab', id: 'tab-' + id, 'aria-selected': String(id === tab), 'aria-controls': 'tool-panel', tabindex: id === tab ? '0' : '-1' }, label);
     b.addEventListener('click', () => switchTab(id));
     b.addEventListener('keydown', (e) => {
-      const i = TABS.findIndex(([t]) => t === id);
+      const i = tabs.findIndex(([t]) => t === id);
       if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
         e.preventDefault();
-        const n = TABS[(i + (e.key === 'ArrowRight' ? 1 : TABS.length - 1)) % TABS.length][0];
+        const n = tabs[(i + (e.key === 'ArrowRight' ? 1 : tabs.length - 1)) % tabs.length][0];
         switchTab(n);
         tabsEl.querySelector('#tab-' + n).focus();
       }
@@ -379,7 +385,7 @@ export function mountTool(container, def, ctx) {
   function switchTab(id) {
     if (mode === 'session' && id !== 'practice' && session && session.total > 0) finishSession(true, false);
     tab = id;
-    tabButtons.forEach((b, i) => { const on = TABS[i][0] === id; b.setAttribute('aria-selected', String(on)); b.tabIndex = on ? 0 : -1; });
+    tabButtons.forEach((b, i) => { const on = tabs[i][0] === id; b.setAttribute('aria-selected', String(on)); b.tabIndex = on ? 0 : -1; });
     panel.setAttribute('aria-labelledby', 'tab-' + id);
     ctx.setRoute && ctx.setRoute(id);
     render();
@@ -409,6 +415,7 @@ export function mountTool(container, def, ctx) {
   /* ---- practice: start */
   function renderStart() {
     mode = 'start';
+    if (lesson) { renderLessonStart(); return; }
     const ex = def.exercises;
     const list = h('div', { class: 'ex-cards', role: 'radiogroup', 'aria-label': 'Exercise' });
     ex.forEach((e) => {
@@ -444,6 +451,22 @@ export function mountTool(container, def, ctx) {
             h('p', {}, h('button', { type: 'button', class: 'linklike', onclick: () => switchTab('settings') }, 'Change settings'), presetSel ? ' · ' : '', presetSel)),
           startBtn),
         h('p', { class: 'vol-tip' }, 'Tip: start at a low volume, especially with headphones. Adjust it with the volume slider at the top.')));
+  }
+  function renderLessonStart() {
+    const ex = def.exercises.find((e) => e.id === settings.exercise);
+    const startBtn = h('button', { type: 'button', class: 'btn btn-ink btn-lg start-btn' }, 'Start lesson ', kbd('Enter'));
+    startBtn.addEventListener('click', startSession);
+    const best = lesson.best;
+    panel.append(h('div', { class: 'practice-start lesson-start' },
+      h('h2', { class: 'panel-title' }, ex ? ex.name : 'Lesson'),
+      lesson.goal ? h('p', { class: 'lesson-goal' }, lesson.goal) : null,
+      h('dl', { class: 'lesson-facts' },
+        h('div', {}, h('dt', {}, 'Questions'), h('dd', {}, String(settings.sessionLength))),
+        h('div', {}, h('dt', {}, 'Pass mark'), h('dd', {}, lesson.pass + '%')),
+        h('div', {}, h('dt', {}, 'Your best'), h('dd', {}, best ? best.best + '%' + (best.passed ? ' · passed' : '') : 'Not tried yet'))),
+      ex && ex.description ? h('p', { class: 'muted' }, ex.description) : null,
+      h('div', { class: 'start-row' }, h('p', { class: 'muted' }, 'Lesson settings are fixed. Your own settings in the full tool are not changed.'), startBtn),
+      h('p', { class: 'vol-tip' }, 'Tip: start at a low volume, especially with headphones. Adjust it with the volume slider at the top.')));
   }
   function renderStartKeep(btn) {
     panel.querySelectorAll('.ex-card').forEach((b) => { const on = b === btn; b.setAttribute('aria-checked', String(on)); b.tabIndex = on ? 0 : -1; });
@@ -568,6 +591,8 @@ export function mountTool(container, def, ctx) {
     if (!session) return;
     const secs = (performance.now() - session.started) / 1000;
     if (session.total > 0) store.recordSession(def.id, { exercise: session.exercise, total: session.total, correct: session.correct, seconds: secs });
+    // A lesson counts only when every question was answered.
+    if (lesson && session.total > 0 && !early) session.lessonResult = lesson.onFinish({ total: session.total, correct: session.correct });
     session.seconds = secs;
     session.early = early;
     if (session.total === 0) { session = null; mode = 'start'; if (rerender) render(); return; }
@@ -583,11 +608,13 @@ export function mountTool(container, def, ctx) {
     const ex = def.exercises.find((e) => e.id === s.exercise);
     const missed = Object.entries(s.missed).sort((a, b) => b[1] - a[1]);
     const weak = store.weakestItems(def.id, { exercise: s.exercise, limit: 5 });
-    const again = h('button', { type: 'button', class: 'btn btn-ink btn-lg' }, 'Practise again ', kbd('Enter'));
+    const lr = lesson ? s.lessonResult : null;
+    const again = h('button', { type: 'button', class: lr && lr.passed && lr.next ? 'btn btn-outline btn-lg' : 'btn btn-ink btn-lg' }, lesson ? 'Try again ' : 'Practise again ', kbd('Enter'));
     again.addEventListener('click', startSession);
     panel.append(h('div', { class: 'summary' },
       h('h2', { class: 'panel-title', tabindex: '-1' }, s.early ? 'Session ended' : 'Session complete'),
-      h('p', { class: 'summary-ex' }, ex.name),
+      h('p', { class: 'summary-ex' }, lesson ? lesson.title : ex.name),
+      lesson ? h('p', { class: 'lesson-result ' + (lr && lr.passed ? 'is-pass' : 'is-retry'), role: 'status' }, lessonMessage(lr, s)) : null,
       h('div', { class: 'summary-stats' },
         progressRing(acc, 120, `${Math.round(acc * 100)} percent correct`),
         h('dl', { class: 'stat-list' },
@@ -600,11 +627,21 @@ export function mountTool(container, def, ctx) {
         h('p', { class: 'summary-perfect' }, h('span', { class: 'ok-t', 'aria-hidden': 'true' }, '✓ '), 'No mistakes in this session.'),
       weak.length ? h('div', { class: 'summary-block' }, h('h3', {}, 'Weakest items overall'),
         h('ul', { class: 'review-list' }, weak.map((w) => h('li', {}, `${def.itemLabel ? def.itemLabel(w.item, w.exercise) : w.item} — ${Math.round(w.acc * 100)}% of ${w.n}`)))) : null,
-      h('div', { class: 'summary-actions' }, again,
-        h('button', { type: 'button', class: 'btn btn-outline', onclick: () => { mode = 'start'; switchTab('settings'); } }, 'Change settings'),
-        h('a', { class: 'btn btn-outline', href: '#/' }, 'Back to practice room'))));
+      lesson ? h('div', { class: 'summary-actions' },
+        lr && lr.passed && lr.next ? h('a', { class: 'btn btn-ink btn-lg', href: lr.next.href }, 'Next lesson: ' + lr.next.title) : null,
+        again,
+        h('a', { class: 'btn btn-outline', href: lesson.backHref }, 'Back to ' + lesson.backLabel))
+        : h('div', { class: 'summary-actions' }, again,
+          h('button', { type: 'button', class: 'btn btn-outline', onclick: () => { mode = 'start'; switchTab('settings'); } }, 'Change settings'),
+          h('a', { class: 'btn btn-outline', href: '#/' }, 'Back to practice room'))));
     panel.querySelector('.panel-title').focus({ preventScroll: true });
     session.summaryShown = true;
+  }
+
+  function lessonMessage(lr, s) {
+    if (!lr) return 'The lesson was ended early, so this session does not count towards the course. Answer every question to complete it.';
+    if (lr.passed) return (lr.passedNow ? '✓ Lesson passed. ' : '✓ You have passed this lesson. ') + (lr.next ? 'The next lesson is ready.' : 'That was the last lesson in this list.');
+    return `Not passed yet: you need ${lesson.pass}% and scored ${Math.round((s.correct / s.total) * 100)}%. Review the items below and try again.`;
   }
 
   /* ---- progress */
@@ -702,7 +739,7 @@ export function mountTool(container, def, ctx) {
       h('p', {}, h('button', { type: 'button', class: 'btn btn-outline', onclick: () => { settings = { ...def.defaults }; save(); render(); } }, 'Reset to defaults'))));
   }
 
-  function save() { store.saveToolSettings(def.id, settings); updateReport(); }
+  function save() { if (!lesson) store.saveToolSettings(def.id, settings); updateReport(); }
 
   /* ---- walkthrough & shortcuts */
   function walkthrough() {

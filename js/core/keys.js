@@ -1,5 +1,6 @@
 // Fretwell Music Lab — license keys saved on this device (local storage only).
 import { validateKey, toolsForKeys } from './license.js';
+import { PRODUCTS } from '../products.js';
 
 const KEY = 'fretwell.keys';
 
@@ -38,4 +39,19 @@ export function unlockedTools() {
 
 export function hasKeys() {
   return getKeys().length > 0;
+}
+
+/**
+ * Courses unlocked on this device: { courseId: [add-on ids] }, merging every key saved here.
+ * The owner's all-access key (AA) opens every course with all of its add-ons.
+ */
+export function unlockedCourses() {
+  const out = {};
+  const give = (id, addons) => { out[id] = [...new Set([...(out[id] || []), ...addons])]; };
+  for (const k of getKeys()) {
+    const v = validateKey(k);
+    if (v.course) give(v.product, v.addons);
+    else if (v.code === 'AA') for (const p of PRODUCTS) if (p.tier === 'Courses') give(p.id, Object.keys(p.addons || {}));
+  }
+  return out;
 }

@@ -184,6 +184,24 @@ export function dailySeries(toolId = null, n = 30) {
 
 export function clearProgress() {
   write('progress', { v: 1, tools: {}, days: {} });
+  write('courses', {});
+}
+
+/* ----------------------------------------------------------------- courses */
+// { courseId: { lessonKey: { attempts, best, passed, last } } }
+export function getCourseProgress(courseId) { return read('courses', {})[courseId] || {}; }
+
+/** Record a finished lesson session. Returns the lesson's updated record. */
+export function recordLesson(courseId, lessonKey, { total, correct, pass }) {
+  const all = read('courses', {});
+  const c = all[courseId] || {};
+  const pct = total ? Math.round((correct / total) * 100) : 0;
+  const prev = c[lessonKey] || { attempts: 0, best: 0, passed: false, last: 0 };
+  const rec = { attempts: prev.attempts + 1, best: Math.max(prev.best, pct), passed: prev.passed || pct >= pass, last: Date.now(), lastScore: pct };
+  c[lessonKey] = rec;
+  all[courseId] = c;
+  write('courses', all);
+  return rec;
 }
 
 /* ----------------------------------------------------------------- backup */
@@ -212,6 +230,7 @@ export function exportData() {
     presets,
     prefs: getPrefs(),
     seen: read('seen', {}),
+    courses: read('courses', {}),
     rhythmLatency: read('latency', null),
   };
 }
@@ -247,6 +266,7 @@ export function importBackup(text) {
   for (const [id, list] of Object.entries(data.presets || {})) write('presets.' + id, list);
   if (data.prefs) setPrefs(data.prefs);
   if (data.seen) write('seen', data.seen);
+  if (data.courses) write('courses', data.courses);
   if (data.rhythmLatency !== null && data.rhythmLatency !== undefined) write('latency', data.rhythmLatency);
   const tools = Object.keys(data.progress.tools || {}).length;
   return { ok: true, message: `Progress restored${tools ? ` for ${tools} tool${tools === 1 ? '' : 's'}` : ''}.` };

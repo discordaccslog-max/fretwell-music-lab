@@ -3,7 +3,9 @@ import '../site.js';
 import { TOOLS, TOOL_BY_ID, LOADERS } from './registry.js';
 import * as store from './store.js';
 import { h, mountTool, progressRing, lineChart, fmtDate, toolArt, confirmDialog } from './toolkit.js';
-import { getKeys, addKey, clearKeys, unlockedTools } from '../core/keys.js';
+import { getKeys, addKey, clearKeys, unlockedTools, unlockedCourses } from '../core/keys.js';
+import { courseCards, courseView, lessonView, guideView, reportView } from './courses-view.js';
+import { ADDONS } from '../addons.js';
 import { validateKey } from '../core/license.js';
 import { PRODUCT_BY_ID } from '../products.js';
 import { unlockOnFirstGesture, setVolume, getVolume } from '../core/audio.js';
@@ -44,6 +46,7 @@ function route() {
   const hash = location.hash.replace(/^#\/?/, '');
   const parts = hash.split('/').filter(Boolean);
   if (parts[0] === 'tool' && parts[1]) return openTool(parts[1], parts[2]);
+  if (parts[0] === 'course' && parts[1]) return openCourse(parts[1], parts[2], parts[3]);
   if (parts[0] === 'progress') return progressView();
   if (parts[0] === 'settings') return settingsView();
   if (parts[0] === 'keys') return keysView();
@@ -58,15 +61,22 @@ function roomView(message = '') {
   setNav('room');
   document.title = 'Practice room — Fretwell Music Lab';
   const tools = unlockedTools();
+  const courses = unlockedCourses();
+  const hasCourses = Object.keys(courses).length > 0;
   app.textContent = '';
   const st = store.streak();
   const wrap = h('div', { class: 'wrap room' });
   wrap.appendChild(h('div', { class: 'room-head' },
-    h('div', {}, h('p', { class: 'eyebrow' }, 'Practice room'), h('h1', { class: 'display-sm' }, tools.length ? 'Your tools' : 'Welcome')),
-    tools.length ? h('div', { class: 'room-streak' },
+    h('div', {}, h('p', { class: 'eyebrow' }, 'Practice room'), h('h1', { class: 'display-sm' }, tools.length ? 'Your tools' : hasCourses ? 'Your courses' : 'Welcome')),
+    tools.length || hasCourses ? h('div', { class: 'room-streak' },
       h('span', { class: 'rs-num' }, String(st.current)), h('span', { class: 'rs-label' }, `day streak${st.practisedToday ? ' · practised today' : ''}`)) : null));
   if (message) wrap.appendChild(h('p', { class: 'notice', role: 'status' }, message));
-  if (!tools.length) {
+  if (hasCourses) {
+    if (tools.length) wrap.appendChild(h('h2', { class: 'room-sub' }, 'Your courses'));
+    wrap.appendChild(courseCards(courses));
+    if (tools.length) wrap.appendChild(h('h2', { class: 'room-sub' }, 'Your tools'));
+  }
+  if (!tools.length && !hasCourses) {
     wrap.appendChild(h('div', { class: 'empty-room' },
       h('p', { class: 'lede' }, 'No tools are unlocked on this device yet. Enter the license key from your order confirmation page to open your tools here.'),
       keyEntry((msg) => roomView(msg)),
@@ -86,8 +96,8 @@ function roomView(message = '') {
             progressRing(s.recentAcc, 64),
             h('p', { class: 'rc-last' }, s.last ? ['Last practised', h('br'), h('strong', {}, fmtDate(s.last))] : ['Not practised yet', h('br'), h('strong', {}, 'Open to start')])))));
     }
-    wrap.appendChild(grid);
-    wrap.appendChild(h('p', { class: 'muted room-note' }, 'The ring shows your accuracy over your most recent answers in each tool. ', h('a', { href: '#/keys' }, 'Add another key'), ' to bring more tools into this room.'));
+    if (tools.length) wrap.appendChild(grid);
+    wrap.appendChild(h('p', { class: 'muted room-note' }, tools.length ? 'The ring on each tool shows your accuracy over your most recent answers. ' : 'The ring on each course shows how many lessons you have passed. ', h('a', { href: '#/keys' }, 'Add another key'), ' to bring more into this room.'));
     const installHint = h('div', { class: 'install-hint' }, h('h2', {}, 'Use it offline'),
       h('p', {}, 'This practice room keeps working without an internet connection once it has loaded. To open it like an app, use your browser’s “Install” option, or on iPhone and iPad tap Share, then “Add to Home Screen”.'));
     wrap.appendChild(installHint);
@@ -119,11 +129,39 @@ function keyEntry(onSaved) {
     if (!v.ok) { err.textContent = input.isEmpty() ? 'Enter your license key to continue.' : v.message; input.mark('error'); input.focus(); return; }
     const r = addKey(v.key);
     if (!r.ok) { err.textContent = r.message; return; }
-    const p = PRODUCT_BY_ID[v.product];
-    const name = p ? p.name : (v.label || 'Your tools');
+    const name = keyName(v);
     onSaved(r.already ? `That key was already saved. ${name} is in your room.` : `Key accepted. ${name} is now in your practice room.`);
   });
   return form;
+}
+
+/** Product name for a validated key, with any course add-ons. */
+function keyName(v) {
+  const p = PRODUCT_BY_ID[v.product];
+  const name = p ? p.name : (v.label || 'Your tools');
+  return v.addons && v.addons.length ? `${name} (with ${v.addons.map((a) => ADDONS[a].name.toLowerCase()).join(', ')})` : name;
+}
+
+/* -------------------------------------------------------------- course */
+let routeId = 0;
+async function openCourse(id, section, key) {
+  const courses = unlockedCourses();
+  const p = PRODUCT_BY_ID[id];
+  if (!p || p.tier !== 'Courses') { location.hash = '#/'; return; }
+  if (!courses[id]) { roomView(`${p.name} isn’t unlocked on this device. Enter its key on the Keys page.`); return; }
+  const addons = courses[id];
+  setNav('room');
+  app.textContent = '';
+  const mine = ++routeId;
+  if (section === 'lesson' && key) {
+    const u = await lessonView(app, id, key, addons, () => mine === routeId && location.hash.startsWith(`#/course/${id}/lesson/${key}`));
+    if (u && mine === routeId) unmount = u; else if (u) u();
+    return;
+  }
+  if (section === 'guide' && addons.includes('guide')) guideView(app, id, addons);
+  else if (section === 'report' && addons.includes('export')) reportView(app, id, addons);
+  else courseView(app, id, addons);
+  focusHeading();
 }
 
 /* -------------------------------------------------------------- tool */
@@ -293,8 +331,7 @@ function keysView(message = '') {
     h('h2', {}, 'Keys on this device'),
     keys.length ? h('ul', { class: 'key-list' }, keys.map((k) => {
       const v = validateKey(k);
-      const p = PRODUCT_BY_ID[v.product];
-      return h('li', {}, h('span', { class: 'kl-name' }, p ? p.name : (v.label || v.product)), h('code', { class: 'kl-key' }, k));
+      return h('li', {}, h('span', { class: 'kl-name' }, keyName(v)), h('code', { class: 'kl-key' }, k));
     })) : h('p', { class: 'muted' }, 'No keys are saved on this device.'),
     h('h2', {}, 'Add a key'),
     h('p', {}, 'Each key you add brings its tools into this practice room.'),

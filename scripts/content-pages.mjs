@@ -2,6 +2,7 @@
 
 export const LAST_UPDATED = 'November 8, 2026';
 export const UPDATED_NOV_11 = { label: 'November 11, 2026', iso: '2026-11-11' };
+export const UPDATED_NOV_20 = { label: 'November 20, 2026', iso: '2026-11-20' };
 
 export const FAQ = [
   ['How do license keys work?', `<p>When you buy a tool, the order confirmation page shows your license key straight away. It looks like <code class="key-sample">FRET-ET-7KQ4M-X9D2P-H6TR</code>. Enter it on the <a href="{{r}}unlock/">unlock page</a> and the tool opens in your practice room. The key is checked in your browser — there is no account, password or sign-in.</p>`],
@@ -21,6 +22,7 @@ export const FAQ = [
   ['Can I get a refund?', `<p>Yes. You can get a full refund on any purchase within 14 days, with no reason needed. Contact us through the <a href="{{r}}contact/">Contact page</a> with your order number. See the <a href="{{r}}refunds/">Refund Policy</a> for details.</p>`],
   ['Is it a subscription?', `<p>No. Each product is a one-time purchase. There are no recurring charges.</p>`],
   ['Do I need an account?', `<p>No. There is no account and no password. Your key unlocks your tools, and everything else stays in your browser.</p>`],
+  ['What are courses and course add-ons?', `<p>A course is a guided sequence of lessons built on the tools. Each lesson opens a tool with set exercises and a pass mark, and your course page shows which lessons you have passed. Course add-ons are optional extras you choose on the course page before checkout: a practice planner (a calendar file of your lessons), a printable course guide, three bonus challenge lessons, or a progress report you can download as a spreadsheet. Which add-ons are available, and their prices, are listed on each course page. Your add-ons are included in the same license key as the course.</p>`],
 ];
 
 export const ABOUT = `
@@ -44,7 +46,7 @@ export const ABOUT = `
 export const REFUNDS = `
 <p>We want you to be happy with what you buy. If you are not, you can have your money back.</p>
 <h2>14-day refunds, no reason needed</h2>
-<p>You can get a full refund on any purchase if you ask within 14 days of buying it. You don’t need to give a reason.</p>
+<p>You can get a full refund on any purchase if you ask within 14 days of buying it. You don’t need to give a reason. Course add-ons bought with a course are part of the same order and are covered in the same way.</p>
 <h2>How to ask for a refund</h2>
 <p>Contact us through the <a href="{{r}}contact/">Contact page</a> and include your order number. Including the email address you used at checkout helps us find your order quickly.</p>
 <h2>When you will get your money</h2>
@@ -65,8 +67,10 @@ export const DELIVERY = `
   <li><strong>You return to your order confirmation page.</strong> As soon as your payment is complete, the payment provider sends you to that product’s order confirmation page on this site.</li>
   <li><strong>Your license key appears immediately.</strong> The confirmation page creates your license key in your browser and shows it straight away, together with the product name, the date and time and, when the payment provider supplies one, your order reference.</li>
   <li><strong>You save your key.</strong> Copy the key, use “Save confirmation” to download a text file containing your order details and key, or print the page.</li>
-  <li><strong>You unlock your tools.</strong> Select “Open my tools”, or go to the <a href="{{r}}unlock/">unlock page</a> (also reachable from the “Have a key?” link at the top of every page), and enter your key. Your tools open right away in your practice room, in your web browser.</li>
+  <li><strong>You unlock your tools or course.</strong> Select “Open my tools” (“Open my course” for a course), or go to the <a href="{{r}}unlock/">unlock page</a> (also reachable from the “Have a key?” link at the top of every page), and enter your key. Your tools or course open right away in your practice room, in your web browser.</li>
 </ol>
+<h2>Courses and add-ons</h2>
+<p>A course and the add-ons you chose are delivered together, in one license key. Your order confirmation page lists the add-ons in your order. When you enter the key, the course opens in your practice room with those add-ons on its course page. Calendar files, printable guides and progress spreadsheets are created in your browser when you ask for them; nothing is posted or emailed.</p>
 <h2>When delivery happens</h2>
 <p>Delivery is immediate: your key is shown within seconds of your payment being completed, on the page the payment provider returns you to. The key is not posted or emailed by us, so save it from the confirmation page.</p>
 <h2>Using your key on more devices</h2>
@@ -80,8 +84,8 @@ export const DELIVERY = `
 `;
 
 export const DISCLAIMER = `
-<h2>Practice aids, not lessons</h2>
-<p>Fretwell Music Lab tools are practice aids for music theory and ear training. They are not lessons, and they don’t replace a teacher.</p>
+<h2>Practice aids, not tuition</h2>
+<p>Fretwell Music Lab tools are practice aids for music theory and ear training. Courses arrange the tools’ exercises into a sequence of practice “lessons”; they do not include teaching by a person, and they don’t replace a teacher.</p>
 <h2>No promised results</h2>
 <p>Progress depends on how often you practise, where you start, and other individual factors. We describe what each tool trains, but we don’t promise any specific result.</p>
 <h2>Theory conventions</h2>
@@ -99,14 +103,15 @@ export const TERMS = `
 <h2>1. Accepting these terms</h2>
 <p>By using this website or buying a product, you agree to these terms. If you don’t agree, please don’t use the site or buy products.</p>
 <h2>2. What the products are</h2>
-<p>Fretwell Music Lab products are online music training tools that run in your web browser. Each product is unlocked with a license key. The product pages describe what each tool includes and what you need to use it.</p>
+<p>Fretwell Music Lab products are online music training tools that run in your web browser, and guided courses built on those tools. A course is a sequence of practice exercises (“lessons”) with set settings and pass marks. Each product is unlocked with a license key. The product pages describe what each tool or course includes and what you need to use it.</p>
+<p>Courses can come with optional add-ons, such as a practice planner or bonus lessons. Add-ons are features of that course: you choose them on the course page before checkout, and they are included in the same license key as the course.</p>
 <h2>3. Your license</h2>
 <p>When you buy a product, you receive a personal, non-exclusive license to use it for your own practice. You may use your key on any number of your own devices.</p>
 <p>Each key is for your personal use only. You may not share, publish, sell or transfer your key, or make the tools available to other people.</p>
 <h2>4. Teachers and schools</h2>
 <p>If you would like to use the tools with students or in a classroom, contact us through the <a href="{{r}}contact/">Contact page</a> to ask about a classroom license.</p>
 <h2>5. Prices, taxes and payment</h2>
-<p>Prices are shown in US dollars on each product page. Each product is a one-time purchase, not a subscription. Payment is handled by our third-party payment provider at checkout. Applicable taxes are calculated and shown at checkout before you pay, according to your location.</p>
+<p>Prices are shown in US dollars on each product page. Course add-ons are priced individually on the course page, which shows the total for the course and the add-ons you choose. Each product is a one-time purchase, not a subscription. Payment is handled by our third-party payment provider at checkout. Applicable taxes are calculated and shown at checkout before you pay, according to your location.</p>
 <h2>6. Agreeing before you buy</h2>
 <p>Before you can continue to checkout, you must tick the box on the product page confirming that you agree to these Terms of Service and our <a href="{{r}}refunds/">Refund Policy</a>. The buy button stays inactive until you do. By completing a purchase, you confirm that you have read and agree to both.</p>
 <h2>7. Delivery</h2>

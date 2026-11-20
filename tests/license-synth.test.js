@@ -34,7 +34,7 @@ test('every product in products.js has a key code and a thank-you page path', ()
     assert.ok(p.checkoutUrl === '' || /^https:\/\/\S+$/.test(p.checkoutUrl), `${p.id} checkout link must be empty or https`);
     assert.equal(typeof p.price, 'number');
   }
-  const prices = Object.fromEntries(PRODUCTS.map((p) => [p.id, p.price]));
+  const prices = Object.fromEntries(PRODUCTS.filter((p) => p.tier !== 'Courses').map((p) => [p.id, p.price]));
   assert.deepEqual(prices, {
     'note-reader': 10, 'interval-trainer': 14, 'scale-explorer': 16, 'chord-builder': 19, 'rhythm-lab': 22,
     'foundations-bundle': 49, 'progression-lab': 35, 'jazz-harmony': 45, 'melodic-dictation': 55, atelier: 75,

@@ -416,6 +416,30 @@ input[type="range"] { accent-color: var(--vermilion); }
 .agree label { cursor: pointer; }
 .agree-hint { font-size: 0.88rem; color: var(--muted); margin: 8px 0 0; }
 .agree-hint.is-needed { color: var(--bad); font-weight: 700; }
+
+/* Course add-ons on the buy card */
+.addon-pick { border: 0; margin: 4px 0 0; padding: 4px 0 0; min-width: 0; }
+.addon-pick legend { font: 700 0.78rem/1 var(--font-body); text-transform: uppercase; letter-spacing: 0.14em; padding: 0; margin-bottom: 10px; float: left; width: 100%; }
+.addon-opt { display: flex; align-items: flex-start; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--soft-rule); clear: both; }
+.addon-opt input { width: 20px; height: 20px; margin: 2px 0 0; accent-color: var(--vermilion); flex: none; cursor: pointer; }
+.addon-opt label { cursor: pointer; display: grid; grid-template-columns: 1fr auto; gap: 2px 10px; flex: 1; min-width: 0; }
+.addon-name { font-weight: 700; }
+.addon-price { font: 600 0.95rem/1.3 var(--font-mono); }
+.addon-desc { grid-column: 1 / -1; font-size: 0.84rem; color: var(--muted); line-height: 1.4; }
+.addon-total { font-size: 1.05rem; margin: 12px 0 14px; }
+.addon-total strong { font: 700 1.35rem/1 var(--font-head); letter-spacing: -0.02em; }
+.tile-addons { font: 600 0.82rem/1 var(--font-body); letter-spacing: 0; color: inherit; opacity: 0.75; }
+.tile--course .tile-art { min-height: 0; padding: 18px 24px; flex: none; }
+.tile--course .tile-art .art { width: min(40%, 120px); }
+.tile--course .tile-body { flex: 1; }
+.course-level { font: 700 0.85rem/1 var(--font-body); text-transform: uppercase; letter-spacing: 0.14em; margin: 28px 0 14px; }
+.courses .course-level:first-of-type { margin-top: 8px; }
+.unit-h { font-size: 1.15rem; margin: 22px 0 8px; }
+.lesson-list { margin: 0; padding-left: 1.6em; border-top: 2px solid var(--fg); }
+.lesson-list li { padding: 10px 0 10px 4px; border-bottom: 1px solid var(--soft-rule); }
+.lesson-list li::marker { font: 700 0.95rem var(--font-mono); }
+.lesson-t { display: block; font: 650 1.05rem/1.3 var(--font-head); letter-spacing: -0.01em; }
+.lesson-d { display: block; font-size: 0.88rem; color: var(--muted); margin-top: 2px; }
 .btn-buy[aria-disabled="true"] { cursor: not-allowed; }
 .btn-buy { width: 100%; background: var(--vermilion); color: #121212; border-color: #121212; font-size: 1.15rem; min-height: 58px; }
 .buy-facts { list-style: none; padding: 0; margin: 0 0 14px; font-size: 0.95rem; }

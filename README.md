@@ -29,6 +29,15 @@ Live site: https://fretwell-music-lab.vercel.app/ (hosted on Vercel). A copy is 
 
 Keys look like `FRET-ET-7KQ4M-X9D2P-H6TR`: a product code, ten random characters and a four-character checksum, using an alphabet without 0, O, 1, I or L. Thank-you pages generate a key in the browser; the unlock page checks the format and checksum in the browser and saves valid keys in local storage. A Foundations Bundle key (`FB`) unlocks all five Foundations tools. There is no server, so keys cannot be revoked, and anyone who knows a thank-you page address can generate keys for that product. To send a replacement key to a customer, open the product's thank-you page yourself and copy the key it shows.
 
+## Courses and add-ons
+
+25 guided courses ($20–$145) sit alongside the ten tools. A course is a list of lessons (`js/courses.js`); each lesson opens a tool with fixed settings, a question count and a pass mark, and results are kept per lesson in the browser. Each course offers 3 or 4 add-ons ($1–$5) from: practice planner (.ics calendar), printable course guide, three bonus challenge lessons, and progress export (CSV and printable report).
+
+- Add-ons are recorded inside the license key (the first random character), so one key carries the course and its add-ons.
+- Each combination of add-ons needs its own payment link and has its own confirmation page: `thank-you/<course>/` for no add-ons, `thank-you/<course>/planner-bonus/` and so on. Paste links into `js/products.js`: `checkoutUrl` for no add-ons, `addonCheckoutUrls` keyed like `'planner+bonus'` for the rest. A combination without a link shows no buy button.
+- `node scripts/checkout-links.mjs` lists every combination with its total and the redirect address to set on the payment link (`--csv` for a spreadsheet).
+- Courses are not in the fulfillment evidence kit yet.
+
 ## Project layout
 
 - `index.html`, `products/`, `about/`, `faq/`, `contact/`, policy pages, `unlock/`, `thank-you/`, `404.html` — generated pages (do not edit by hand; edit the templates)
