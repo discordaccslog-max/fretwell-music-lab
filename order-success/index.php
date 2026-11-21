@@ -89,7 +89,9 @@ body { background: #fff; color: #1a1a1a; font: 400 15px/1.6 'Geist', -apple-syst
 .rc-logo { display: flex; align-items: center; gap: 8px; text-decoration: none; color: #1a1a1a; margin-bottom: 40px; }
 .rc-logo svg { width: 22px; height: 22px; flex-shrink: 0; }
 .rc-logo span { font: 600 0.8rem/1.2 'Geist', sans-serif; letter-spacing: -0.01em; }
-h1 { font: 500 1.15rem/1.3 'Geist', sans-serif; letter-spacing: -0.01em; margin-bottom: 24px; }
+h1 { font: 700 1.75rem/1.2 'Geist', sans-serif; letter-spacing: -0.02em; margin-bottom: 6px; }
+.rc-subtitle { font-size: 1.05rem; color: #555; margin-bottom: 36px; }
+.rc-key-heading { font: 500 0.85rem/1 'Geist', sans-serif; color: #888; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 16px; }
 .rc-key-wrap { margin-bottom: 32px; }
 .rc-key-label { font-size: 0.75rem; color: #888; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; }
 .rc-key { font: 500 clamp(0.95rem, 3vw, 1.25rem)/1.5 'Geist Mono', ui-monospace, monospace; letter-spacing: 0.02em; border: 1px solid #ddd; border-radius: 4px; padding: 14px 16px; background: #fafafa; user-select: all; -webkit-user-select: all; word-break: break-all; }
@@ -115,8 +117,10 @@ h1 { font: 500 1.15rem/1.3 'Geist', sans-serif; letter-spacing: -0.01em; margin-
 
 <?php if ($from_payment): ?>
 
-  <h1>Your License Key</h1>
+  <h1>Order Confirmed</h1>
+  <p class="rc-subtitle">Thank you for your order.</p>
 
+  <p class="rc-key-heading">Your License Key</p>
   <div class="rc-key-wrap">
     <p class="rc-key-label">License key</p>
     <p class="rc-key" id="ful-key"><?php echo htmlspecialchars($license_key); ?></p>
