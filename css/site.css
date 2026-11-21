@@ -640,3 +640,26 @@ select, .input { min-height: 44px; border: 2px solid var(--fg); background: var(
 .cart-summary .btn-buy { width: 100%; justify-content: center; }
 .cart-soon { border-left: 6px solid var(--saffron); padding: 8px 12px; background: var(--bg); font-weight: 600; }
 .cart-page .linklike { background: none; border: 0; padding: 0; color: inherit; font: inherit; font-weight: 700; text-decoration: underline; cursor: pointer; min-height: 32px; }
+
+/* Contact form */
+.contact-email { font-size: 1.1rem; }
+.contact-email a { font-weight: 700; overflow-wrap: anywhere; }
+.contact-form { border: 3px solid var(--fg); background: var(--surface); padding: 22px; margin: 28px 0 36px; }
+.contact-form h2 { font-size: 1.5rem; margin-bottom: 4px; }
+.cf-row { display: grid; gap: 0 20px; }
+@media (min-width: 720px) { .cf-row { grid-template-columns: 1fr 1fr; } }
+.cf-field { margin: 16px 0 0; }
+.cf-field label { display: block; font-weight: 700; margin-bottom: 6px; }
+.contact-form .input, .contact-form select { width: 100%; font: inherit; color: var(--fg); }
+.contact-form textarea.input { padding: 10px; min-height: 160px; resize: vertical; line-height: 1.5; }
+.contact-form .input:focus, .contact-form select:focus { outline: 3px solid var(--cobalt); outline-offset: 2px; }
+.contact-form [aria-invalid="true"] { border-color: var(--bad); }
+.cf-help { font-size: 0.86rem; color: var(--muted); margin: 6px 0 0; }
+.cf-error { font-size: 0.9rem; color: var(--bad); font-weight: 700; margin: 4px 0 0; min-height: 0; }
+.cf-error:empty { display: none; }
+.contact-form button[type="submit"] { margin-top: 22px; }
+.cf-note { font-size: 0.88rem; color: var(--muted); margin: 10px 0 0; }
+.cf-done { margin-top: 22px; border-top: 2px solid var(--fg); padding-top: 16px; }
+.cf-done h3 { font-size: 1.2rem; }
+.cf-done textarea { font-family: var(--font-mono); font-size: 0.85rem; margin: 6px 0 12px; }
+.cf-status { font-weight: 700; color: var(--ok); min-height: 1.4em; }

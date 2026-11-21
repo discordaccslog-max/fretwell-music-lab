@@ -8,6 +8,7 @@ import { PRODUCTS, PRODUCT_BY_ID } from '../js/products.js';
 import { PRODUCT_CONTENT } from './content-products.mjs';
 import { FAQ, ABOUT, REFUNDS, DELIVERY, DISCLAIMER, TERMS, PRIVACY, ACCESSIBILITY, LAST_UPDATED, UPDATED_NOV_20 } from './content-pages.mjs';
 import { art, LOGO } from '../js/core/art.js';
+import { SITE_CONFIG } from '../js/site-config.js';
 import { COURSE_BY_ID, courseTools, describeLesson, exerciseName, TOOL_NAMES } from '../js/courses.js';
 import { ADDONS, ADDON_ORDER, allCombos, comboPath } from '../js/addons.js';
 
@@ -785,33 +786,54 @@ function cartPage() {
 }
 
 function contactPage() {
+  const topics = ['License key or unlocking', 'Lost key or replacement key', 'Refund', 'Problem with a tool or course', 'Classroom license', 'Something else'];
   const body = `
 <section class="text-page">
   <div class="wrap text-wrap">
     <header class="text-head"><p class="eyebrow">Support</p><h1 class="display-sm">Contact</h1></header>
     ${staffRule}
     <div class="prose">
-      <p class="lede">We are happy to help with keys, refunds, problems with a tool, classroom licenses and anything else.</p>
-      <div class="contact-email" data-contact-email></div>
-      <h2>Response time</h2>
-      <p>We reply within two business days.</p>
-      <h2>What to include</h2>
+      <p class="lede">We are happy to help with keys, refunds, problems with a tool or course, classroom licenses and anything else.</p>
+      <p class="contact-email">Email us at <a href="mailto:${SITE_CONFIG.supportEmail}">${SITE_CONFIG.supportEmail}</a>, or use the form below. We reply within two business days.</p>
+    </div>
+    <form class="contact-form" data-contact-form novalidate>
+      <h2>Send us a message</h2>
+      <p class="small">Fields marked * are required.</p>
+      <div class="cf-row">
+        <div class="cf-field"><label for="cf-name">Your name *</label><input class="input" id="cf-name" name="name" autocomplete="name" required><p class="cf-error" id="cf-name-err"></p></div>
+        <div class="cf-field"><label for="cf-email">Your email address *</label><input class="input" id="cf-email" name="email" type="email" autocomplete="email" required aria-describedby="cf-email-help"><p class="cf-help" id="cf-email-help">Use the address you used at checkout if your message is about an order.</p><p class="cf-error" id="cf-email-err"></p></div>
+      </div>
+      <div class="cf-row">
+        <div class="cf-field"><label for="cf-topic">Topic *</label><select id="cf-topic" name="topic" required><option value="">Choose a topic</option>${topics.map((t) => `<option>${esc(t)}</option>`).join('')}</select><p class="cf-error" id="cf-topic-err"></p></div>
+        <div class="cf-field"><label for="cf-order">Order number</label><input class="input" id="cf-order" name="order" autocomplete="off" aria-describedby="cf-order-help"><p class="cf-help" id="cf-order-help">From your order confirmation or receipt. Needed for lost keys and refunds.</p></div>
+      </div>
+      <div class="cf-field"><label for="cf-message">Message *</label><textarea class="input" id="cf-message" name="message" rows="7" required aria-describedby="cf-message-help"></textarea><p class="cf-help" id="cf-message-help">For a problem with a tool or course: which one and which exercise, what you expected and what happened, and which device and browser you were using.</p><p class="cf-error" id="cf-message-err"></p></div>
+      <button class="btn btn-ink btn-lg" type="submit">Write email</button>
+      <p class="cf-note">This opens your email app with your message filled in, addressed to ${SITE_CONFIG.supportEmail}. Check it and press Send there. Nothing is sent from this page.</p>
+      <div class="cf-done" data-contact-done hidden tabindex="-1">
+        <h3>Your email is ready</h3>
+        <p>If your email app didn’t open, copy the message below and send it to <a href="mailto:${SITE_CONFIG.supportEmail}">${SITE_CONFIG.supportEmail}</a>.</p>
+        <textarea class="input" rows="9" readonly aria-label="Your message" data-contact-copy-text></textarea>
+        <div class="btn-row"><button class="btn btn-outline" type="button" data-contact-copy>Copy message</button><button class="btn btn-outline" type="button" data-contact-copy-address>Copy email address</button></div>
+        <p class="cf-status" role="status" aria-live="polite" data-contact-status></p>
+      </div>
+    </form>
+    <div class="prose">
+      <h2>Before you write</h2>
       <ul>
-        <li>Your <strong>order number</strong>, from your order confirmation or receipt</li>
-        <li>The <strong>email address you used at checkout</strong></li>
-        <li>For a problem with a tool: which tool and exercise, what you expected and what happened, and which device and browser you were using</li>
+        <li>For refunds, see the <a href="{{r}}refunds/">Refund Policy</a>. Include your order number.</li>
+        <li>For a lost key, include your order number and we will send a replacement key in our reply.</li>
+        <li>Common questions are answered in the <a href="{{r}}faq/">FAQ</a>.</li>
       </ul>
-      <p>For refunds, see the <a href="{{r}}refunds/">Refund Policy</a>. For lost keys, include your order number and we will send a replacement key.</p>
-      <p>Common questions are answered in the <a href="{{r}}faq/">FAQ</a>.</p>
     </div>
   </div>
 </section>`;
   page({
     path: 'contact/',
     title: 'Contact — Fretwell Music Lab',
-    description: 'How to contact Fretwell Music Lab for help with license keys, refunds and the tools. We reply within two business days.',
+    description: `Contact Fretwell Music Lab at ${SITE_CONFIG.supportEmail} or with the contact form, for help with license keys, refunds, the tools and courses. We reply within two business days.`,
     body,
-    scripts: [],
+    scripts: ['js/pages/contact.js'],
     bodyClass: 'page-text',
   });
 }

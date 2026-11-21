@@ -10,6 +10,6 @@
 // A checkout page on this site can read the cart with cartLines() and cartTotal() from js/cart.js.
 
 export const SITE_CONFIG = {
-  supportEmail: '',
+  supportEmail: 'fretwellmail@fretwellmusic.live',
   checkoutUrl: '',
 };

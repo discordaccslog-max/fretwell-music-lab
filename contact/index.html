@@ -4,12 +4,12 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Contact — Fretwell Music Lab</title>
-<meta name="description" content="How to contact Fretwell Music Lab for help with license keys, refunds and the tools. We reply within two business days.">
+<meta name="description" content="Contact Fretwell Music Lab at fretwellmail@fretwellmusic.live or with the contact form, for help with license keys, refunds, the tools and courses. We reply within two business days.">
 <link rel="canonical" href="https://fretwell-music-lab.vercel.app/contact/">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Fretwell Music Lab">
 <meta property="og:title" content="Contact — Fretwell Music Lab">
-<meta property="og:description" content="How to contact Fretwell Music Lab for help with license keys, refunds and the tools. We reply within two business days.">
+<meta property="og:description" content="Contact Fretwell Music Lab at fretwellmail@fretwellmusic.live or with the contact form, for help with license keys, refunds, the tools and courses. We reply within two business days.">
 <meta property="og:url" content="https://fretwell-music-lab.vercel.app/contact/">
 <meta property="og:image" content="https://fretwell-music-lab.vercel.app/og-image.png">
 <meta property="og:image:width" content="1200">
@@ -26,7 +26,7 @@
 <link rel="stylesheet" href="../css/site.css">
 <script>(function(){try{var d=document.documentElement,t=localStorage.getItem('fretwell.theme');if(t==='dark'||t==='light')d.setAttribute('data-theme',t);if(localStorage.getItem('fretwell.large')==='1')d.classList.add('is-large');}catch(e){}})();</script>
 <script type="module" src="../js/site.js"></script>
-
+<script type="module" src="../js/pages/contact.js"></script>
 </head>
 <body class="page-text">
 <a class="skip-link" href="#main">Skip to content</a>
@@ -56,18 +56,38 @@
     <header class="text-head"><p class="eyebrow">Support</p><h1 class="display-sm">Contact</h1></header>
     <div class="staff-rule" aria-hidden="true"></div>
     <div class="prose">
-      <p class="lede">We are happy to help with keys, refunds, problems with a tool, classroom licenses and anything else.</p>
-      <div class="contact-email" data-contact-email></div>
-      <h2>Response time</h2>
-      <p>We reply within two business days.</p>
-      <h2>What to include</h2>
+      <p class="lede">We are happy to help with keys, refunds, problems with a tool or course, classroom licenses and anything else.</p>
+      <p class="contact-email">Email us at <a href="mailto:fretwellmail@fretwellmusic.live">fretwellmail@fretwellmusic.live</a>, or use the form below. We reply within two business days.</p>
+    </div>
+    <form class="contact-form" data-contact-form novalidate>
+      <h2>Send us a message</h2>
+      <p class="small">Fields marked * are required.</p>
+      <div class="cf-row">
+        <div class="cf-field"><label for="cf-name">Your name *</label><input class="input" id="cf-name" name="name" autocomplete="name" required><p class="cf-error" id="cf-name-err"></p></div>
+        <div class="cf-field"><label for="cf-email">Your email address *</label><input class="input" id="cf-email" name="email" type="email" autocomplete="email" required aria-describedby="cf-email-help"><p class="cf-help" id="cf-email-help">Use the address you used at checkout if your message is about an order.</p><p class="cf-error" id="cf-email-err"></p></div>
+      </div>
+      <div class="cf-row">
+        <div class="cf-field"><label for="cf-topic">Topic *</label><select id="cf-topic" name="topic" required><option value="">Choose a topic</option><option>License key or unlocking</option><option>Lost key or replacement key</option><option>Refund</option><option>Problem with a tool or course</option><option>Classroom license</option><option>Something else</option></select><p class="cf-error" id="cf-topic-err"></p></div>
+        <div class="cf-field"><label for="cf-order">Order number</label><input class="input" id="cf-order" name="order" autocomplete="off" aria-describedby="cf-order-help"><p class="cf-help" id="cf-order-help">From your order confirmation or receipt. Needed for lost keys and refunds.</p></div>
+      </div>
+      <div class="cf-field"><label for="cf-message">Message *</label><textarea class="input" id="cf-message" name="message" rows="7" required aria-describedby="cf-message-help"></textarea><p class="cf-help" id="cf-message-help">For a problem with a tool or course: which one and which exercise, what you expected and what happened, and which device and browser you were using.</p><p class="cf-error" id="cf-message-err"></p></div>
+      <button class="btn btn-ink btn-lg" type="submit">Write email</button>
+      <p class="cf-note">This opens your email app with your message filled in, addressed to fretwellmail@fretwellmusic.live. Check it and press Send there. Nothing is sent from this page.</p>
+      <div class="cf-done" data-contact-done hidden tabindex="-1">
+        <h3>Your email is ready</h3>
+        <p>If your email app didn’t open, copy the message below and send it to <a href="mailto:fretwellmail@fretwellmusic.live">fretwellmail@fretwellmusic.live</a>.</p>
+        <textarea class="input" rows="9" readonly aria-label="Your message" data-contact-copy-text></textarea>
+        <div class="btn-row"><button class="btn btn-outline" type="button" data-contact-copy>Copy message</button><button class="btn btn-outline" type="button" data-contact-copy-address>Copy email address</button></div>
+        <p class="cf-status" role="status" aria-live="polite" data-contact-status></p>
+      </div>
+    </form>
+    <div class="prose">
+      <h2>Before you write</h2>
       <ul>
-        <li>Your <strong>order number</strong>, from your order confirmation or receipt</li>
-        <li>The <strong>email address you used at checkout</strong></li>
-        <li>For a problem with a tool: which tool and exercise, what you expected and what happened, and which device and browser you were using</li>
+        <li>For refunds, see the <a href="../refunds/">Refund Policy</a>. Include your order number.</li>
+        <li>For a lost key, include your order number and we will send a replacement key in our reply.</li>
+        <li>Common questions are answered in the <a href="../faq/">FAQ</a>.</li>
       </ul>
-      <p>For refunds, see the <a href="../refunds/">Refund Policy</a>. For lost keys, include your order number and we will send a replacement key.</p>
-      <p>Common questions are answered in the <a href="../faq/">FAQ</a>.</p>
     </div>
   </div>
 </section>
