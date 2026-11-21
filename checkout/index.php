@@ -1,8 +1,13 @@
 <?php
 require __DIR__ . '/products.php';
-require __DIR__ . '/../security_gateway/config.php';
+
+// Read credentials from the existing Muadata gateway config.
+// The original config.php installed by Muadata defines $api_user, $private_key, $website.
+// DO NOT overwrite security_gateway/config.php — it contains the real credentials.
+require_once __DIR__ . '/../security_gateway/config.php';
 
 $error = '';
+$billing = [];
 $is_post = $_SERVER['REQUEST_METHOD'] === 'POST';
 
 if ($is_post) {
@@ -11,11 +16,12 @@ if ($is_post) {
     $valid_addons = ['planner', 'guide', 'bonus', 'export'];
     $order_lines = [];
     $order_total = 0;
+    $order_product = [];
 
     foreach ($raw_items as $item) {
         $id = isset($item['id']) ? trim($item['id']) : '';
         $product = lookup_product($id);
-        if (!$product) { $error = 'Your cart contains an item we don't recognise. Please go back and try again.'; break; }
+        if (!$product) { $error = 'Your cart contains an item we could not find. Please go back and try again.'; break; }
 
         $addons = [];
         if (isset($item['addons']) && is_array($item['addons'])) {
@@ -30,6 +36,17 @@ if ($is_post) {
         $line_total = calc_line_total($id, $addons);
         $order_lines[] = ['id' => $id, 'name' => $product['name'], 'addons' => $addons, 'total' => $line_total];
         $order_total += $line_total;
+
+        // Build Muadata order_product format
+        $order_product[] = [
+            'name' => $product['name'],
+            'model' => $id,
+            'price' => number_format($line_total, 2, '.', ''),
+            'quantity' => 1,
+            'option' => [],
+            'weight' => 0,
+            'products_image' => '',
+        ];
     }
 
     if (!$error && empty($order_lines)) {
@@ -38,7 +55,6 @@ if ($is_post) {
 
     // ── Validate billing fields ──
     $fields = ['first_name', 'last_name', 'email', 'address', 'city', 'state', 'zip', 'country'];
-    $billing = [];
     if (!$error) {
         foreach ($fields as $f) {
             $billing[$f] = isset($_POST[$f]) ? trim($_POST[$f]) : '';
@@ -48,69 +64,88 @@ if ($is_post) {
         elseif (!$billing['address'] || !$billing['city'] || !$billing['zip'] || !$billing['country']) $error = 'Please complete all billing address fields.';
     }
 
-    // ── Build item descriptions ──
-    $item_descriptions = [];
-    if (!$error) {
-        foreach ($order_lines as $line) {
-            $desc = $line['name'];
-            if (!empty($line['addons'])) $desc .= ' (+' . implode(', ', $line['addons']) . ')';
-            $item_descriptions[] = $desc;
-        }
-    }
+    // ── Payment method ──
+    $pay = (isset($_POST['payment_method']) && $_POST['payment_method'] === 'paypal') ? 'paypal' : 'nolimit';
 
-    // ── Post to payment gateway (server-side only) ──
-    if (!$error && $api_user && $private_key) {
-        $gateway_url = 'https://gateway.abpayment.us/create_payment/custom';
-        $order_id = 'FML-' . date('Ymd') . '-' . strtoupper(substr(md5(uniqid(mt_rand(), true)), 0, 4));
+    // ── Post to Muadata gateway (server-side only) ──
+    if (!$error && !empty($api_user) && !empty($private_key)) {
+        $order_id = 'ORDER_' . str_replace('-', '_', bin2hex(random_bytes(16)));
+        $order_currency = 'USD';
+        $order_amount = number_format($order_total, 2, '.', '');
 
-        $payload = [
-            'api_user'      => $api_user,
-            'private_key'   => $private_key,
-            'website'       => $website,
-            'order_id'      => $order_id,
-            'amount'        => number_format($order_total, 2, '.', ''),
-            'currency'      => 'USD',
-            'description'   => implode('; ', $item_descriptions),
-            'customer_email' => $billing['email'],
-            'customer_name'  => $billing['first_name'] . ' ' . $billing['last_name'],
-            'address'        => $billing['address'],
-            'city'           => $billing['city'],
-            'state'          => $billing['state'],
-            'zip_code'       => $billing['zip'],
-            'country'        => $billing['country'],
-            'success_url'    => 'https://fretwellmusic.live/order-success/',
-            'cancel_url'     => 'https://fretwellmusic.live/checkout/',
-        ];
+        // sign = MD5(api_user + PrivateKey + order_currency + order_amount + order_id)
+        $sign = md5($api_user . $private_key . $order_currency . $order_amount . $order_id);
 
-        $ch = curl_init($gateway_url);
+        $params = http_build_query([
+            'order_id' => $order_id,
+            'order_currency' => $order_currency,
+            'order_amount' => $order_amount,
+            'order_product' => json_encode($order_product),
+            'pay' => $pay,
+            'api_user' => $api_user,
+            'website' => $website,
+            'sign' => $sign,
+            'ip' => $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0',
+            'lan' => 'en-US',
+            'user_agent' => $_SERVER['HTTP_USER_AGENT'] ?? 'Mozilla/5.0',
+            'billing_first_name' => $billing['first_name'],
+            'billing_last_name' => $billing['last_name'],
+            'billing_email' => $billing['email'],
+            'billing_phone' => '0000000000',
+            'billing_address1' => $billing['address'],
+            'billing_city' => $billing['city'],
+            'billing_state' => $billing['state'],
+            'billing_zip' => $billing['zip'],
+            'billing_country' => $billing['country'],
+            'shipping_first_name' => $billing['first_name'],
+            'shipping_last_name' => $billing['last_name'],
+            'shipping_email' => $billing['email'],
+            'shipping_phone' => '0000000000',
+            'shipping_address1' => $billing['address'],
+            'shipping_city' => $billing['city'],
+            'shipping_state' => $billing['state'],
+            'shipping_zip' => $billing['zip'],
+            'shipping_country' => $billing['country'],
+            'order_return_uri' => 'https://fretwellmusic.live/order-failed',
+            'order_success_uri' => 'https://fretwellmusic.live/order-success',
+            'order_notify_uri' => 'https://fretwellmusic.live/order-success',
+            'reorder' => 'reorder',
+            'jump' => '1',
+        ]);
+
+        $ch = curl_init('https://gateway.abpayment.us/create_payment/custom');
         curl_setopt_array($ch, [
             CURLOPT_POST           => true,
-            CURLOPT_POSTFIELDS     => http_build_query($payload),
+            CURLOPT_POSTFIELDS     => $params,
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_TIMEOUT        => 30,
-            CURLOPT_SSL_VERIFYPEER => true,
         ]);
         $response = curl_exec($ch);
-        $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         $curl_error = curl_error($ch);
         curl_close($ch);
 
-        if ($curl_error || $http_code < 200 || $http_code >= 300) {
-            $error = 'We couldn't process your payment right now. Please try again in a moment.';
+        if ($curl_error) {
+            $error = 'Payment could not be processed. Please try again.';
         } else {
-            $result = json_decode($response, true);
-            if (!empty($result['redirect_url'])) {
-                header('Location: ' . $result['redirect_url']);
-                exit;
-            } elseif (!empty($result['payment_url'])) {
-                header('Location: ' . $result['payment_url']);
-                exit;
+            // Response may be JSON or URL-encoded
+            $linkform = null;
+            $trimmed = trim($response);
+            if (substr($trimmed, 0, 1) === '{') {
+                $data = json_decode($trimmed, true);
+                $linkform = $data['linkform'] ?? null;
             } else {
-                $error = 'We couldn't process your payment right now. Please try again in a moment.';
+                parse_str($trimmed, $parsed);
+                $linkform = $parsed['linkform'] ?? null;
             }
+
+            if ($linkform) {
+                header('Location: ' . $linkform);
+                exit;
+            }
+            $error = 'Payment could not be processed. Please try again.';
         }
-    } elseif (!$error && (!$api_user || !$private_key)) {
-        $error = 'Checkout is not configured yet. Please try again later.';
+    } elseif (!$error) {
+        $error = 'Checkout is not available right now. Please try again later.';
     }
 }
 ?>
@@ -278,8 +313,16 @@ if ($is_post) {
       </fieldset>
 
       <fieldset>
-        <legend>Payment</legend>
-        <p style="font-size:0.88rem;color:var(--ink-50,#6b7280);margin-bottom:8px;">You'll be redirected to our secure payment processor to complete your purchase.</p>
+        <legend>Payment method</legend>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <label style="display:flex;align-items:center;gap:10px;padding:12px 14px;border:1px solid #d1d5db;border-radius:6px;cursor:pointer;font-size:0.9rem;">
+            <input type="radio" name="payment_method" value="card" checked style="margin:0;"> Credit / Debit Card
+          </label>
+          <label style="display:flex;align-items:center;gap:10px;padding:12px 14px;border:1px solid #d1d5db;border-radius:6px;cursor:pointer;font-size:0.9rem;">
+            <input type="radio" name="payment_method" value="paypal" style="margin:0;"> PayPal
+          </label>
+        </div>
+        <p style="font-size:0.82rem;color:#6b7280;margin-top:10px;">You'll be redirected to complete payment securely.</p>
       </fieldset>
 
       <button type="submit" class="ck-submit" id="ck-pay" disabled>Pay now</button>
