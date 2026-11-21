@@ -84,53 +84,100 @@ if ($from_payment) {
 <link rel="stylesheet" href="../css/site.css">
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
-body { background: #fff; color: #1a1a1a; font: 400 15px/1.6 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; -webkit-font-smoothing: antialiased; }
-.rc { max-width: 480px; margin: 0 auto; padding: 48px 20px 60px; }
-.rc-logo { display: flex; align-items: center; gap: 8px; text-decoration: none; color: #1a1a1a; margin-bottom: 40px; }
-.rc-logo svg { width: 22px; height: 22px; flex-shrink: 0; }
-.rc-logo span { font: 600 0.8rem/1.2 'Geist', sans-serif; letter-spacing: -0.01em; }
-h1 { font: 700 1.75rem/1.2 'Geist', sans-serif; letter-spacing: -0.02em; margin-bottom: 6px; }
-.rc-subtitle { font-size: 1.05rem; color: #555; margin-bottom: 36px; }
-.rc-key-heading { font: 500 0.85rem/1 'Geist', sans-serif; color: #888; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 16px; }
-.rc-key-wrap { margin-bottom: 32px; }
-.rc-key-label { font-size: 0.75rem; color: #888; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; }
-.rc-key { font: 500 clamp(0.95rem, 3vw, 1.25rem)/1.5 'Geist Mono', ui-monospace, monospace; letter-spacing: 0.02em; border: 1px solid #ddd; border-radius: 4px; padding: 14px 16px; background: #fafafa; user-select: all; -webkit-user-select: all; word-break: break-all; }
-.rc-btns { display: flex; gap: 8px; margin-top: 16px; }
-.rc-btn { display: inline-flex; align-items: center; justify-content: center; height: 36px; padding: 0 16px; font: 500 0.82rem/1 'Geist', sans-serif; border: 1px solid #d0d0d0; border-radius: 4px; background: #fff; color: #1a1a1a; cursor: pointer; text-decoration: none; transition: background 0.15s; }
-.rc-btn:hover { background: #f5f5f5; }
-.rc-note { font-size: 0.85rem; color: #666; line-height: 1.55; margin-top: 20px; }
-.rc-footer { margin-top: 48px; padding-top: 20px; border-top: 1px solid #eee; font-size: 0.8rem; color: #999; }
-.rc-footer a { color: #666; }
-.rc-empty { text-align: center; padding-top: 18vh; }
-.rc-empty h1 { margin-bottom: 8px; }
-.rc-empty p { color: #888; font-size: 0.95rem; }
+body { background: #f9fafb; color: #1a1a1a; font: 400 15px/1.6 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; -webkit-font-smoothing: antialiased; min-height: 100vh; }
+
+/* layout */
+.rc { max-width: 520px; margin: 0 auto; padding: 40px 20px 60px; }
+.rc-card { background: #fff; border: 1px solid #e5e7eb; border-radius: 8px; padding: 32px 28px; margin-bottom: 24px; }
+
+/* logo bar */
+.rc-logo { display: flex; align-items: center; gap: 8px; text-decoration: none; color: #1a1a1a; margin-bottom: 28px; }
+.rc-logo svg { width: 20px; height: 20px; flex-shrink: 0; }
+.rc-logo span { font: 600 0.78rem/1.2 'Geist', sans-serif; letter-spacing: -0.01em; color: #555; }
+
+/* success header */
+.rc-check { width: 48px; height: 48px; margin: 0 auto 16px; display: block; }
+.rc-header { text-align: center; margin-bottom: 28px; }
+.rc-header h1 { font: 600 1.5rem/1.25 'Geist', sans-serif; letter-spacing: -0.02em; margin-bottom: 4px; }
+.rc-header p { font-size: 0.95rem; color: #6b7280; }
+
+/* order details */
+.rc-details { border-top: 1px solid #f0f0f0; padding-top: 20px; margin-bottom: 4px; }
+.rc-row { display: flex; justify-content: space-between; align-items: baseline; padding: 8px 0; font-size: 0.88rem; }
+.rc-row dt { color: #6b7280; }
+.rc-row dd { font-weight: 500; text-align: right; }
+
+/* key section */
+.rc-section-label { font: 500 0.72rem/1 'Geist', sans-serif; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px; }
+.rc-key { font: 500 clamp(0.92rem, 3vw, 1.15rem)/1.5 'Geist Mono', ui-monospace, monospace; letter-spacing: 0.02em; border: 1px solid #e5e7eb; border-radius: 6px; padding: 14px 16px; background: #f9fafb; user-select: all; -webkit-user-select: all; word-break: break-all; }
+.rc-btns { display: flex; gap: 8px; margin-top: 14px; }
+.rc-btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; height: 36px; padding: 0 16px; font: 500 0.82rem/1 'Geist', sans-serif; border: 1px solid #d1d5db; border-radius: 6px; background: #fff; color: #374151; cursor: pointer; text-decoration: none; transition: background 0.15s, border-color 0.15s; }
+.rc-btn:hover { background: #f9fafb; border-color: #9ca3af; }
+.rc-btn-primary { background: #1a1a1a; color: #fff; border-color: #1a1a1a; }
+.rc-btn-primary:hover { background: #333; }
+
+/* note */
+.rc-note { font-size: 0.84rem; color: #6b7280; line-height: 1.55; margin-top: 16px; padding-top: 16px; border-top: 1px solid #f0f0f0; }
+
+/* return link */
+.rc-return { display: block; text-align: center; margin-top: 20px; font-size: 0.88rem; color: #6b7280; text-decoration: none; }
+.rc-return:hover { color: #374151; }
+.rc-return svg { width: 14px; height: 14px; vertical-align: -2px; margin-right: 4px; }
+
+/* footer */
+.rc-footer { text-align: center; padding-top: 20px; font-size: 0.78rem; color: #9ca3af; }
+.rc-footer a { color: #6b7280; text-decoration: none; }
+.rc-footer a:hover { text-decoration: underline; }
+
+/* empty state */
+.rc-empty { text-align: center; padding-top: 16vh; }
+.rc-empty h1 { font: 600 1.5rem/1.25 'Geist', sans-serif; margin-bottom: 8px; }
+.rc-empty p { color: #6b7280; font-size: 0.95rem; }
+
+@media (max-width: 540px) {
+  .rc-card { padding: 24px 20px; }
+  .rc-btns { flex-direction: column; }
+  .rc-btn { width: 100%; }
+}
 </style>
 <script>(function(){try{var d=document.documentElement,t=localStorage.getItem('fretwell.theme');if(t==='dark'||t==='light')d.setAttribute('data-theme',t);}catch(e){}})();</script>
 </head>
 <body>
 <div class="rc">
 
-  <a class="rc-logo" href="../">
+  <a class="rc-logo" href="https://fretwellmusic.live">
     <svg viewBox="0 0 32 32" aria-hidden="true" focusable="false"><rect width="32" height="32" fill="#1a1a1a"/><g fill="#fff"><rect x="5" y="9" width="22" height="1.6"/><rect x="5" y="13" width="22" height="1.6"/><rect x="5" y="17" width="22" height="1.6"/><rect x="5" y="21" width="22" height="1.6"/><rect x="5" y="25" width="22" height="1.6"/></g><circle cx="20" cy="17.8" r="5" fill="#E3412B"/></svg>
     <span>Fretwell Music Lab</span>
   </a>
 
 <?php if ($from_payment): ?>
 
-  <h1>Order Confirmed</h1>
-  <p class="rc-subtitle">Thank you for your order.</p>
-
-  <p class="rc-key-heading">Your License Key</p>
-  <div class="rc-key-wrap">
-    <p class="rc-key-label">License key</p>
-    <p class="rc-key" id="ful-key"><?php echo htmlspecialchars($license_key); ?></p>
-    <div class="rc-btns">
-      <button class="rc-btn" type="button" id="ful-copy">Copy Key</button>
-      <a class="rc-btn" href="https://fretwellmusic.live/unlock/">Unlock Your Tools</a>
+  <div class="rc-card">
+    <div class="rc-header">
+      <svg class="rc-check" viewBox="0 0 48 48" fill="none" aria-hidden="true"><circle cx="24" cy="24" r="24" fill="#ecfdf5"/><circle cx="24" cy="24" r="18" fill="#d1fae5"/><path d="M16 24.5l5.5 5.5L32 19" stroke="#16a34a" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+      <h1>Order Confirmed</h1>
+      <p>Thank you for your order.</p>
     </div>
+
+    <dl class="rc-details">
+      <div class="rc-row"><dt>Order reference</dt><dd><?php echo htmlspecialchars($_GET['order_no']); ?></dd></div>
+      <div class="rc-row"><dt>Status</dt><dd>Complete &mdash; delivered</dd></div>
+      <div class="rc-row"><dt>Delivery method</dt><dd>Digital license key</dd></div>
+      <div class="rc-row"><dt>Date</dt><dd><script>document.write(new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'}))</script></dd></div>
+    </dl>
   </div>
 
-  <p class="rc-note">Save this key. Enter it at the unlock page to access your tools on any device.</p>
+  <div class="rc-card">
+    <p class="rc-section-label">Your License Key</p>
+    <p class="rc-key" id="ful-key"><?php echo htmlspecialchars($license_key); ?></p>
+    <div class="rc-btns">
+      <button class="rc-btn" type="button" id="ful-copy"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="5.5" y="5.5" width="8" height="8" rx="1.5"/><path d="M5.5 10.5h-1a1.5 1.5 0 01-1.5-1.5v-5a1.5 1.5 0 011.5-1.5h5a1.5 1.5 0 011.5 1.5v1"/></svg>Copy Key</button>
+      <a class="rc-btn rc-btn-primary" href="https://fretwellmusic.live/unlock/">Unlock Your Tools</a>
+    </div>
+    <p class="rc-note">Save this key. Enter it at the unlock page to access your tools on any device.</p>
+  </div>
+
+  <a class="rc-return" href="https://fretwellmusic.live"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2L4 8l6 6"/></svg>Return to Fretwell Music Lab</a>
 
   <p class="rc-footer">Need help? <a href="https://fretwellmusic.live/contact/">Contact us</a></p>
 
@@ -161,6 +208,7 @@ h1 { font: 700 1.75rem/1.2 'Geist', sans-serif; letter-spacing: -0.02em; margin-
 <?php else: ?>
 
   <div class="rc-empty">
+    <svg class="rc-check" viewBox="0 0 48 48" fill="none" aria-hidden="true" style="margin:0 auto 16px;display:block;width:48px;height:48px"><circle cx="24" cy="24" r="24" fill="#ecfdf5"/><circle cx="24" cy="24" r="18" fill="#d1fae5"/><path d="M16 24.5l5.5 5.5L32 19" stroke="#16a34a" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
     <h1>Order Confirmed</h1>
     <p>Thank you for your purchase.</p>
   </div>
