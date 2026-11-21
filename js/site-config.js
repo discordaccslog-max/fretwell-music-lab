@@ -11,5 +11,5 @@
 
 export const SITE_CONFIG = {
   supportEmail: 'fretwellmail@fretwellmusic.live',
-  checkoutUrl: '',
+  checkoutUrl: 'checkout/',
 };
