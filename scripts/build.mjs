@@ -785,6 +785,54 @@ function cartPage() {
   });
 }
 
+function checkoutPage() {
+  const body = `
+<section class="text-page checkout-page">
+  <div class="wrap">
+    <header class="text-head"><p class="eyebrow"><a href="{{r}}cart/">Cart</a> · Checkout</p><h1 class="display-sm">Checkout</h1></header>
+    ${staffRule}
+    <div class="co-grid">
+      <section class="co-summary" aria-labelledby="co-summary-h">
+        <h2 id="co-summary-h">Order summary</h2>
+        <div data-checkout-summary><noscript><p>Checkout needs JavaScript turned on.</p></noscript></div>
+        <h2>What you are buying</h2>
+        <ul class="tick-list co-facts">
+          <li>Digital products: online music-training tools and guided courses that run in your web browser. Nothing is shipped.</li>
+          <li>Each product is unlocked with a license key, delivered as described in our <a href="{{r}}delivery/">Delivery Policy</a>.</li>
+          <li>One-time purchase. No subscription and no account.</li>
+          <li>Full refund on request within 14 days of purchase, no reason needed. See the <a href="{{r}}refunds/">Refund Policy</a>.</li>
+          <li>You need a modern web browser and speakers or headphones. All sounds are synthesized, not recorded.</li>
+        </ul>
+      </section>
+      <section class="co-pay" aria-labelledby="co-pay-h" data-checkout-pay hidden>
+        <h2 id="co-pay-h">Payment</h2>
+        <div class="agree">
+          <input type="checkbox" id="agree-checkout">
+          <label for="agree-checkout">I agree to the <a href="{{r}}terms/">Terms of Service</a> and <a href="{{r}}refunds/">Refund Policy</a></label>
+        </div>
+        <p class="agree-hint" id="agree-hint-checkout" aria-live="polite"></p>
+        <div class="co-buttons">
+          <button type="button" class="btn btn-lg co-pay-btn" data-pay="option-1" aria-disabled="true" aria-describedby="agree-hint-checkout co-pay-note">Payment option 1</button>
+          <button type="button" class="btn btn-lg co-pay-btn" data-pay="option-2" aria-disabled="true" aria-describedby="agree-hint-checkout co-pay-note">Payment option 2</button>
+        </div>
+        <p class="co-status" role="status" aria-live="polite" data-pay-status></p>
+        <p class="small" id="co-pay-note">You enter your payment details with the payment provider, not on this site. Applicable taxes are shown before you confirm payment.</p>
+        <p class="small">Questions before you buy? <a href="{{r}}contact/">Contact us</a> or email <a href="mailto:${SITE_CONFIG.supportEmail}">${SITE_CONFIG.supportEmail}</a>. See also our <a href="{{r}}privacy/">Privacy Policy</a>.</p>
+      </section>
+    </div>
+  </div>
+</section>`;
+  page({
+    path: 'checkout/',
+    title: 'Checkout — Fretwell Music Lab',
+    description: 'Review your order and pay for your Fretwell Music Lab tools and guides.',
+    body,
+    noindex: true,
+    scripts: ['js/pages/checkout.js'],
+    bodyClass: 'page-text',
+  });
+}
+
 function contactPage() {
   const topics = ['License key or unlocking', 'Lost key or replacement key', 'Refund', 'Problem with a tool or course', 'Classroom license', 'Something else'];
   const body = `
@@ -878,6 +926,7 @@ textPage({ path: 'about/', title: 'About — Fretwell Music Lab', h1: 'About Fre
 faqPage();
 contactPage();
 cartPage();
+checkoutPage();
 textPage({ path: 'terms/', title: 'Terms of Service — Fretwell Music Lab', h1: 'Terms of Service', description: 'The terms that apply when you use the Fretwell Music Lab website and buy and use its products.', html: TERMS, dated: true, eyebrow: 'Policies', updated: UPDATED_NOV_20 });
 textPage({ path: 'privacy/', title: 'Privacy Policy — Fretwell Music Lab', h1: 'Privacy Policy', description: 'No cookies, no analytics, no trackers. Your keys, progress and settings stay in your browser. How order information is handled and your rights.', html: PRIVACY, dated: true, eyebrow: 'Policies' });
 textPage({ path: 'refunds/', title: 'Refund Policy — Fretwell Music Lab', h1: 'Refund Policy', description: 'Full refund on any Fretwell Music Lab purchase within 14 days, no reason required.', html: REFUNDS, dated: true, eyebrow: 'Policies', updated: UPDATED_NOV_20 });

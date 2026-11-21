@@ -663,3 +663,29 @@ select, .input { min-height: 44px; border: 2px solid var(--fg); background: var(
 .cf-done h3 { font-size: 1.2rem; }
 .cf-done textarea { font-family: var(--font-mono); font-size: 0.85rem; margin: 6px 0 12px; }
 .cf-status { font-weight: 700; color: var(--ok); min-height: 1.4em; }
+
+/* Checkout */
+.co-grid { display: grid; gap: 32px; align-items: start; }
+@media (min-width: 900px) { .co-grid { grid-template-columns: 1fr 380px; } }
+.co-summary h2, .co-pay h2 { font-size: 1.4rem; margin: 0 0 12px; }
+.co-summary h2 + div { margin-bottom: 28px; }
+.co-lines { list-style: none; margin: 0; padding: 0; border-top: 3px solid var(--fg); }
+.co-line { display: flex; justify-content: space-between; gap: 16px; padding: 14px 0; border-bottom: 1px solid var(--soft-rule); }
+.co-name { font: 650 1.1rem/1.25 var(--font-head); margin: 0 0 4px; }
+.co-sub { font-size: 0.88rem; color: var(--muted); margin: 0; }
+.co-addons { list-style: none; margin: 4px 0 0; padding: 0; font-size: 0.88rem; color: var(--muted); }
+.co-price { font: 700 1.2rem/1 var(--font-head); margin: 0; flex: none; }
+.co-totals { margin: 12px 0 8px; }
+.co-totals > div { display: flex; justify-content: space-between; gap: 16px; padding: 6px 0; }
+.co-totals dt { font-weight: 600; }
+.co-totals dd { margin: 0; text-align: right; color: var(--muted); max-width: 60%; }
+.co-totals .co-grand { border-top: 2px solid var(--fg); margin-top: 6px; padding-top: 10px; }
+.co-totals .co-grand dd { color: var(--fg); font: 700 1.5rem/1 var(--font-head); }
+.co-facts li { font-size: 0.95rem; }
+.co-pay { border: 3px solid var(--fg); background: var(--surface); padding: 22px; }
+@media (min-width: 900px) { .co-pay { position: sticky; top: 90px; } }
+.co-buttons { display: grid; gap: 12px; margin: 14px 0 8px; }
+.co-pay-btn { width: 100%; justify-content: center; background: var(--fg); color: var(--bg); border-color: var(--fg); }
+.co-pay-btn[aria-disabled="true"] { opacity: 0.45; cursor: not-allowed; }
+.co-status { font-weight: 700; min-height: 1.4em; margin: 4px 0 8px; }
+.cart-go { width: 100%; justify-content: center; margin: 12px 0 4px; }

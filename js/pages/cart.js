@@ -48,19 +48,7 @@ function render() {
     el('p', { class: 'cart-total' }, 'Total ', el('strong', {}, `$${total}`), ' USD'),
     el('p', { class: 'small' }, `${lines.length} item${lines.length === 1 ? '' : 's'} · One-time purchase · Applicable taxes are shown at checkout`));
   if (checkout) {
-    // Same agreement as on the product pages: checkout stays inactive until the box is ticked.
-    const box = el('input', { type: 'checkbox', id: 'agree-cart' });
-    const go = el('a', { class: 'btn btn-buy btn-lg', role: 'link', tabindex: '0', 'aria-disabled': 'true', 'aria-describedby': 'agree-hint-cart' }, `Checkout — $${total}`);
-    const hint = el('p', { class: 'agree-hint', id: 'agree-hint-cart', 'aria-live': 'polite' });
-    const sync = () => {
-      if (box.checked) { go.href = new URL(checkout, root).href; go.removeAttribute('aria-disabled'); hint.textContent = ''; hint.classList.remove('is-needed'); }
-      else { go.removeAttribute('href'); go.setAttribute('aria-disabled', 'true'); hint.textContent = 'Tick the box above to agree to the Terms of Service and Refund Policy before checkout.'; }
-    };
-    go.addEventListener('click', (e) => { if (!box.checked) { e.preventDefault(); hint.classList.add('is-needed'); box.focus(); } });
-    go.addEventListener('keydown', (e) => { if (!box.checked && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); go.click(); } });
-    box.addEventListener('change', sync);
-    summary.append(el('div', { class: 'agree' }, box, el('label', { for: 'agree-cart' }, 'I agree to the ', el('a', { href: root + 'terms/' }, 'Terms of Service'), ' and ', el('a', { href: root + 'refunds/' }, 'Refund Policy'))), go, hint);
-    sync();
+    summary.append(el('a', { class: 'btn btn-ink btn-lg cart-go', href: new URL(checkout, root).href }, 'Continue to checkout'));
   } else {
     summary.append(el('p', { class: 'cart-soon' }, 'Checkout for the cart isn’t available yet. Your cart is saved in this browser.'));
   }

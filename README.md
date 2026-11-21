@@ -44,7 +44,9 @@ Every product page has an "Add to cart" button (courses add the add-ons ticked a
 
 - The cart lives in the browser's local storage under `fretwell.cart` as `{ v: 1, items: [{ id, addons, added }] }`. Prices are not stored.
 - A checkout page should get items and prices from `cartLines()` and `cartTotal()` in `js/cart.js`, which work them out from `js/products.js`. Don't trust prices passed in from the browser.
-- Set `checkoutUrl` in `js/site-config.js` to turn on the cart's checkout button (it uses the same Terms agreement checkbox as the product pages). While it is empty, the cart says checkout isn't available yet.
+- The cart's "Continue to checkout" button goes to `checkout/` (`checkoutUrl` in `js/site-config.js`; empty it to hide the button). The checkout page shows the order summary, the Terms agreement checkbox and two payment buttons. It asks for no personal or card details.
+- To connect a payment method, fill in `PAYMENT_OPTIONS` in `js/pages/checkout.js` (`'option-1'` and `'option-2'`). Each handler gets `{ lines, total, currency }` and should send the buyer to the provider; prices must be checked again on your server. Rename the buttons in `checkoutPage()` in `scripts/build.mjs`. Until a handler is set, its button says it isn't connected and takes no payment.
+- Delivery for cart orders (one key per item, with course add-ons) still has to be built along with the payment integration.
 - The existing single-product buy buttons (Square links) are unchanged and still work alongside the cart.
 
 ## Project layout
