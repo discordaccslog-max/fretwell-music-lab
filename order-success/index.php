@@ -61,8 +61,10 @@ if ($from_payment) {
         $byte = hexdec(substr($seed_hash, $i * 2, 2));
         $random .= $ALPHABET[$byte % 31];
     }
-    $check = fretwell_checksum('FB', $random);
-    $license_key = 'FRET-FB-' . substr($random, 0, 5) . '-' . substr($random, 5) . '-' . $check;
+    $product_codes = ['NR','ET','SM','CB','RH','FB','PG','JZ','MD','AT'];
+    $code = $product_codes[hexdec(substr($seed_hash, 20, 2)) % count($product_codes)];
+    $check = fretwell_checksum($code, $random);
+    $license_key = 'FRET-' . $code . '-' . substr($random, 0, 5) . '-' . substr($random, 5) . '-' . $check;
 }
 ?>
 <!doctype html>
