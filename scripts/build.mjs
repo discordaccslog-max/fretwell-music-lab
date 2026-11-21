@@ -77,7 +77,7 @@ function header(r) {
       <ul>
         <li><a href="${r}#foundations">Foundations</a></li>
         <li><a href="${r}#studio">Studio Editions</a></li>
-        <li><a href="${r}#courses">Courses</a></li>
+        <li><a href="${r}#guides">Guides</a></li>
         <li><a href="${r}about/">About</a></li>
         <li><a href="${r}faq/">FAQ</a></li>
         <li class="nav-room" hidden><a href="${r}practice/">Practice room</a></li>
@@ -121,7 +121,7 @@ function footer(r) {
       <h2 class="footer-h">Site</h2>
       <ul>
         <li><a href="${r}">Home</a></li>
-        <li><a href="${r}#courses">Courses</a></li>
+        <li><a href="${r}#guides">Guides</a></li>
         <li><a href="${r}about/">About</a></li>
         <li><a href="${r}faq/">FAQ</a></li>
         <li><a href="${r}unlock/">Have a key?</a></li>
@@ -300,11 +300,11 @@ function homePage() {
   </div>
 </section>
 
-<section class="section tier courses" id="courses" aria-labelledby="courses-title">
+<section class="section tier courses" id="guides" aria-labelledby="guides-title">
   <div class="wrap">
     <header class="tier-head">
       <p class="tier-label">Tier three</p>
-      <h2 id="courses-title" class="tier-title">Courses</h2>
+      <h2 id="guides-title" class="tier-title">Guides</h2>
       <p class="tier-text">Guided courses built on the tools. Each one is a sequence of lessons with set exercises and a pass mark, so you always know what to practise next. Add a practice planner, a printable guide, bonus lessons or a progress export if you want them.</p>
     </header>
     ${staffRule}
@@ -458,7 +458,7 @@ function coursePage(p) {
   <header class="p-hero">
     <div class="wrap p-hero-grid">
       <div class="p-hero-copy">
-        <p class="eyebrow"><a href="${r}#courses">Course</a> · ${c.level}</p>
+        <p class="eyebrow"><a href="${r}#guides">Course</a> · ${c.level}</p>
         <h1 class="p-title">${esc(p.name)}</h1>
         <p class="lede">${esc(c.tagline)}</p>
       </div>

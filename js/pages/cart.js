@@ -25,7 +25,7 @@ function render() {
   if (!lines.length) {
     host.append(el('div', { class: 'cart-empty' },
       el('p', { class: 'lede' }, 'Your cart is empty.'),
-      el('p', {}, 'Browse the ', el('a', { href: root + '#foundations' }, 'tools'), ' and ', el('a', { href: root + '#courses' }, 'courses'), ', then choose “Add to cart” on any product page.')));
+      el('p', {}, 'Browse the ', el('a', { href: root + '#foundations' }, 'tools'), ' and ', el('a', { href: root + '#guides' }, 'guides'), ', then choose “Add to cart” on any product page.')));
     return;
   }
   const list = el('ul', { class: 'cart-list' });
