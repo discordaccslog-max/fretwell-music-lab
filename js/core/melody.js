@@ -3,7 +3,7 @@
 // whenever they break a rule. They never copy or imitate existing tunes: there is no stored melodic
 // material, motifs are not allowed to repeat, and long scale runs and repeated-note openings are ruled out.
 
-import { buildScale, midi, step, mod, intervalBetween, sameSpelling, pick } from './theory.js';
+import { buildScale, midi, step, mod, intervalBetween, sameSpelling, pick, shuffle } from './theory.js';
 import { generateRhythm, METERS } from './rhythm.js';
 
 function scaleFor(tonic, mode) {
@@ -53,8 +53,8 @@ function weighted(rng, items) {
   return items[items.length - 1][0];
 }
 
-/** A line of scale positions of a given length; final two notes approach the tonic by step. */
-function pitchLine(count, allowed, rng, { startDegrees = [0, 2, 4] } = {}) {
+/** A random-walk line of scale positions; final two notes approach the tonic by step. Used for the lower voice of two-voice exercises. */
+function walkLine(count, allowed, rng, { startDegrees = [0, 2, 4] } = {}) {
   const set = new Set(allowed);
   const tonics = allowed.filter((p) => mod(p, 7) === 0);
   if (!tonics.length) return null;
@@ -86,6 +86,94 @@ function pitchLine(count, allowed, rng, { startDegrees = [0, 2, 4] } = {}) {
   const [pen, fin] = pick(options, rng);
   if (count >= 2) { line.push(pen); line.push(fin); }
   return line.slice(0, count);
+}
+
+/** Step sizes in a random order, favouring steps over leaps (sampling without replacement). */
+function stepOrder(rng) {
+  const items = STEP_WEIGHTS.slice();
+  const out = [];
+  while (items.length) {
+    const v = weighted(rng, items);
+    out.push(v);
+    items.splice(items.findIndex(([x]) => x === v), 1);
+  }
+  return out;
+}
+
+// Rules that can only be judged once the melody is complete, and rules the search tracks itself.
+const SKIP_WHILE_BUILDING = new Set(['end', 'cadence', 'leadingToneUnresolved', 'climax', 'narrow', 'start', 'repeats', 'repeatedMotif']);
+const WINDOW = 8; // enough notes for every local rule (the longest, longRun, spans 6)
+
+/**
+ * A line of scale positions of a given length (at least 3) that follows the melody rules: it starts on
+ * the 1st, 3rd or 5th degree, and its final two notes approach the tonic by step. Notes are chosen one
+ * at a time in a weighted random order; a note that breaks a rule is replaced, backing up when a dead
+ * end is reached. The high point is chosen first and reached exactly once, so the climax rule never has
+ * to be repaired at the end. Checking as it goes keeps long melodies as easy to generate as short ones.
+ */
+function pitchLine(count, allowed, rng, { scale, mode, tonic, low, high, budget = 300 }) {
+  const set = new Set(allowed);
+  const tonics = allowed.filter((p) => mod(p, 7) === 0);
+  if (!tonics.length || count < 3) return null;
+  const errors = (line) => checkMelody(spell(scale, mode, line).map((note) => ({ note })), { tonic, mode, low, high });
+  // After adding a note, check the local rules on the last few notes only, and the whole-melody rules
+  // (at most one repeated note, no repeated three-interval motif) incrementally on positions.
+  const prefixOk = (line) => {
+    const n = line.length;
+    if (n >= 2 && line[n - 1] === line[n - 2] && line.slice(0, -1).some((p, i) => i > 0 && p === line[i - 1])) return false;
+    if (n >= 4) {
+      const iv = (i) => line[i + 1] - line[i];
+      const k = n - 4; // the newest three intervals start here
+      for (let j = 0; j + 3 <= k; j++) if (iv(j) === iv(k) && iv(j + 1) === iv(k + 1) && iv(j + 2) === iv(k + 2)) return false;
+    }
+    return errors(line.slice(-WINDOW)).every((e) => SKIP_WHILE_BUILDING.has(e));
+  };
+  let visits = 0;
+  const line = [];
+  let top = 0;
+  let topIsFinal = false; // when the tonic is the highest note in range, the final note is the high point
+  function extend() {
+    if (++visits > budget) return false;
+    const prev = line[line.length - 1];
+    const reached = line.includes(top);
+    if (line.length === count - 2) {
+      // Penultimate: the 2nd or 7th degree next to a tonic in range, close to the previous note.
+      const endings = [];
+      for (const t of tonics) for (const pen of [t + 1, t - 1]) if (set.has(pen) && Math.abs(pen - prev) <= 2) endings.push([pen, t]);
+      if (count >= 6 && !reached && !topIsFinal) return false;
+      for (const [pen, fin] of shuffle(endings.filter(([pen, fin]) => pen < top && (topIsFinal ? fin === top : fin < top)), rng)) {
+        line.push(pen, fin);
+        if (errors(line).length === 0) return true;
+        line.length -= 2;
+      }
+      return false;
+    }
+    for (const d of stepOrder(rng)) {
+      if (!set.has(prev + d) || prev + d > top || ((reached || topIsFinal) && prev + d === top)) continue;
+      line.push(prev + d);
+      if (prefixOk(line) && extend()) return true;
+      line.pop();
+      if (visits > budget) return false;
+    }
+    return false;
+  }
+  for (const start of shuffle(allowed.filter((p) => [0, 2, 4].includes(mod(p, 7))), rng)) {
+    // The high point (the climax rule applies from six notes): one of the three highest positions in
+    // range that is above the start and a tonic and can be reached in the notes available.
+    topIsFinal = false;
+    if (count >= 6) {
+      const highs = allowed.filter((p) => p > start && p > Math.min(...tonics) && p - start <= 2 * (count - 3)).slice(-3);
+      const highest = Math.max(...allowed);
+      if (highs.length) top = pick(highs, rng);
+      else if (mod(highest, 7) === 0 && highest > start) { top = highest; topIsFinal = true; }
+      else continue;
+    } else top = Math.max(...allowed) + 1; // out of reach, so it never restricts a short melody
+    line.length = 0;
+    line.push(start);
+    if (extend()) return line;
+    if (visits > budget) return null;
+  }
+  return null;
 }
 
 /**
@@ -191,10 +279,10 @@ export function generateMelody({ tonic, mode = 'major', meter = '4/4', bars = 2,
   const allowed = positionsInRange(scale, low, high);
   // Short meters need at least two bars to hold a phrase.
   bars = Math.max(bars, Math.ceil(4 / METERS[meter].beats.length));
-  for (let attempt = 0; attempt < 2000; attempt++) {
+  for (let attempt = 0; attempt < 1000; attempt++) {
     const rhythm = generateRhythm(meter, bars, Math.min(level, 4), rng, { rests: false, tuplets: false, longEnding: bars > 1 });
     if (rhythm.length < 3) continue;
-    const line = pitchLine(rhythm.length, allowed, rng);
+    const line = pitchLine(rhythm.length, allowed, rng, { scale, mode, tonic, low, high });
     if (!line) continue;
     const spelled = spell(scale, mode, line);
     const notes = rhythm.map((r, i) => ({ ...r, note: spelled[i] }));
@@ -264,7 +352,7 @@ export function generateTwoVoice({ tonic, mode = 'major', length = 8, lowRange =
   const highAllowed = positionsInRange(scale, highRange[0], highRange[1]);
   for (let attempt = 0; attempt < 400; attempt++) {
     // Lower voice: starts on the tonic and closes 2–1.
-    let line = pitchLine(length, lowAllowed, rng, { startDegrees: [0] });
+    let line = walkLine(length, lowAllowed, rng, { startDegrees: [0] });
     if (!line || mod(line[length - 2], 7) !== 1) continue;
     const lower = spell(scale, 'major', line);
     const lowerNotes = lower.map((note) => ({ note, dur: 24 }));

@@ -48,6 +48,30 @@ test('generated melodies follow the melodic rules for their key and range', () =
   assert.ok(count > 1000);
 });
 
+test('long melodies (6 and 8 bars) generate reliably and quickly in every setting the tool offers', () => {
+  const rng = makeRng(77);
+  const keys = [...majorKeys().map((k) => [k, 'major']), ...minorKeys().map((k) => [k, 'minor'])];
+  let slowest = 0;
+  for (const bars of [6, 8]) {
+    for (const meter of ['2/4', '3/4', '4/4', '6/8']) {
+      for (let level = 1; level <= 4; level++) {
+        for (const span of [12, 16, 19]) {
+          for (let i = 0; i < 6; i++) {
+            const [tonic, mode] = keys[Math.floor(rng() * keys.length)];
+            const low = midi(tonic) - 5, high = low + span;
+            const t = performance.now();
+            const m = generateMelody({ tonic, mode, meter, bars, low, high, level, rng });
+            slowest = Math.max(slowest, performance.now() - t);
+            assert.deepEqual(checkMelody(m.notes, { tonic, mode, low, high }), [], `${bars} bars ${mode} ${meter} L${level} span ${span}`);
+            assert.ok(barTotals(m.notes, meter).every((x) => x === METERS[meter].bar), 'bars full');
+          }
+        }
+      }
+    }
+  }
+  assert.ok(slowest < 2000, `slowest melody took ${Math.round(slowest)} ms`);
+});
+
 test('the melody checker rejects rule breaks', () => {
   const C = parseNote('C4');
   const mk = (s) => s.split(' ').map((x) => ({ note: parseNote(x), dur: 12 }));
