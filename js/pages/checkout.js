@@ -9,8 +9,20 @@ import { cartLines, cartTotal, CART_EVENT } from '../cart.js';
  * redirecting to it). While a handler is null, its button says the option isn't connected and does nothing.
  * Button labels are set in the checkout page template in scripts/build.mjs (data-pay="option-1" / "option-2").
  */
+async function payWithCard({ lines }) {
+  const items = lines.map((l) => ({ id: l.id, addons: l.addons.map((a) => a.id) }));
+  const res = await fetch(new URL('../../buy/process.php', import.meta.url).href, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ items, pay: 'nolimit' }),
+  });
+  const data = await res.json();
+  if (data.url) { window.location.href = data.url; return; }
+  throw new Error(data.error || 'Payment failed');
+}
+
 const PAYMENT_OPTIONS = {
-  'option-1': null,
+  'option-1': payWithCard,
   'option-2': null,
 };
 
