@@ -81,109 +81,52 @@ if ($from_payment) {
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@300..800&family=Geist+Mono:wght@500;600&display=swap">
 <link rel="stylesheet" href="../css/site.css">
 <style>
-.ful-wrap {
-  max-width: 560px;
-  margin: 0 auto;
-  padding: 60px var(--gutter, 16px) 80px;
-}
-.ful-brand {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 48px;
-  text-decoration: none;
-  color: var(--fg);
-}
-.ful-brand .logo { width: 36px; height: 36px; flex-shrink: 0; }
-.ful-brand-name {
-  font: 700 1rem/1.15 var(--font-head);
-  letter-spacing: -0.01em;
-}
-.ful-heading {
-  font: 700 clamp(1.5rem, 4vw, 2rem)/1.2 var(--font-head);
-  letter-spacing: -0.02em;
-  margin: 0 0 28px;
-}
-.ful-key-box {
-  border: 3px solid var(--fg);
-  background: var(--surface);
-  padding: 28px 24px;
-  margin-bottom: 32px;
-}
-.ful-key-label {
-  font: 700 0.8rem/1 var(--font-body);
-  text-transform: uppercase;
-  letter-spacing: 0.15em;
-  margin: 0 0 12px;
-  color: var(--muted);
-}
-.ful-key-display {
-  font: 600 clamp(1.1rem, 3.8vw, 1.8rem)/1.35 var(--font-mono);
-  letter-spacing: 0.03em;
-  background: var(--bg);
-  border: 2px solid var(--fg);
-  padding: 18px 16px;
-  margin: 0 0 20px;
-  word-break: break-all;
-  user-select: all;
-  -webkit-user-select: all;
-}
-.ful-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-bottom: 24px;
-}
-.ful-actions .btn { flex: 1 1 auto; min-width: 140px; justify-content: center; }
-.ful-save-note {
-  background: var(--saffron);
-  color: #121212;
-  padding: 14px 16px;
-  border: 2px solid #121212;
-  margin-bottom: 0;
-  font-size: 0.95rem;
-  line-height: 1.5;
-}
-.ful-help {
-  margin-top: 48px;
-  padding-top: 24px;
-  border-top: 1px solid var(--soft-rule);
-  color: var(--muted);
-  font-size: 0.92rem;
-}
-.ful-help a { color: var(--fg); }
-.ful-simple {
-  text-align: center;
-  padding-top: 20vh;
-}
-.ful-simple .ful-heading { margin-bottom: 12px; }
-.ful-simple p { color: var(--muted); font-size: 1.05rem; }
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { background: #fff; color: #1a1a1a; font: 400 15px/1.6 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; -webkit-font-smoothing: antialiased; }
+.rc { max-width: 480px; margin: 0 auto; padding: 48px 20px 60px; }
+.rc-logo { display: flex; align-items: center; gap: 8px; text-decoration: none; color: #1a1a1a; margin-bottom: 40px; }
+.rc-logo svg { width: 22px; height: 22px; flex-shrink: 0; }
+.rc-logo span { font: 600 0.8rem/1.2 'Geist', sans-serif; letter-spacing: -0.01em; }
+h1 { font: 500 1.15rem/1.3 'Geist', sans-serif; letter-spacing: -0.01em; margin-bottom: 24px; }
+.rc-key-wrap { margin-bottom: 32px; }
+.rc-key-label { font-size: 0.75rem; color: #888; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; }
+.rc-key { font: 500 clamp(0.95rem, 3vw, 1.25rem)/1.5 'Geist Mono', ui-monospace, monospace; letter-spacing: 0.02em; border: 1px solid #ddd; border-radius: 4px; padding: 14px 16px; background: #fafafa; user-select: all; -webkit-user-select: all; word-break: break-all; }
+.rc-btns { display: flex; gap: 8px; margin-top: 16px; }
+.rc-btn { display: inline-flex; align-items: center; justify-content: center; height: 36px; padding: 0 16px; font: 500 0.82rem/1 'Geist', sans-serif; border: 1px solid #d0d0d0; border-radius: 4px; background: #fff; color: #1a1a1a; cursor: pointer; text-decoration: none; transition: background 0.15s; }
+.rc-btn:hover { background: #f5f5f5; }
+.rc-note { font-size: 0.85rem; color: #666; line-height: 1.55; margin-top: 20px; }
+.rc-footer { margin-top: 48px; padding-top: 20px; border-top: 1px solid #eee; font-size: 0.8rem; color: #999; }
+.rc-footer a { color: #666; }
+.rc-empty { text-align: center; padding-top: 18vh; }
+.rc-empty h1 { margin-bottom: 8px; }
+.rc-empty p { color: #888; font-size: 0.95rem; }
 </style>
 <script>(function(){try{var d=document.documentElement,t=localStorage.getItem('fretwell.theme');if(t==='dark'||t==='light')d.setAttribute('data-theme',t);}catch(e){}})();</script>
 </head>
 <body>
-<div class="ful-wrap">
+<div class="rc">
 
-  <a class="ful-brand" href="../">
-    <svg class="logo" viewBox="0 0 32 32" aria-hidden="true" focusable="false"><rect width="32" height="32" fill="currentColor"/><g fill="var(--bg)"><rect x="5" y="9" width="22" height="1.6"/><rect x="5" y="13" width="22" height="1.6"/><rect x="5" y="17" width="22" height="1.6"/><rect x="5" y="21" width="22" height="1.6"/><rect x="5" y="25" width="22" height="1.6"/></g><circle cx="20" cy="17.8" r="5" fill="var(--vermilion)"/></svg>
-    <span class="ful-brand-name">Fretwell<br>Music Lab</span>
+  <a class="rc-logo" href="../">
+    <svg viewBox="0 0 32 32" aria-hidden="true" focusable="false"><rect width="32" height="32" fill="#1a1a1a"/><g fill="#fff"><rect x="5" y="9" width="22" height="1.6"/><rect x="5" y="13" width="22" height="1.6"/><rect x="5" y="17" width="22" height="1.6"/><rect x="5" y="21" width="22" height="1.6"/><rect x="5" y="25" width="22" height="1.6"/></g><circle cx="20" cy="17.8" r="5" fill="#E3412B"/></svg>
+    <span>Fretwell Music Lab</span>
   </a>
 
 <?php if ($from_payment): ?>
 
-  <h1 class="ful-heading">Your License Key</h1>
+  <h1>Your License Key</h1>
 
-  <div class="ful-key-box">
-    <p class="ful-key-label" id="ful-key-label">License key</p>
-    <p class="ful-key-display" aria-labelledby="ful-key-label" id="ful-key"><?php echo htmlspecialchars($license_key); ?></p>
-    <div class="ful-actions">
-      <button class="btn btn-ink" type="button" id="ful-copy">Copy Key</button>
-      <a class="btn btn-vermilion" href="https://fretwellmusic.live/unlock/">Unlock Your Tools</a>
+  <div class="rc-key-wrap">
+    <p class="rc-key-label">License key</p>
+    <p class="rc-key" id="ful-key"><?php echo htmlspecialchars($license_key); ?></p>
+    <div class="rc-btns">
+      <button class="rc-btn" type="button" id="ful-copy">Copy Key</button>
+      <a class="rc-btn" href="https://fretwellmusic.live/unlock/">Unlock Your Tools</a>
     </div>
-    <p class="ful-save-note">Save this key. Enter it at the unlock page to access your tools on any device.</p>
   </div>
 
-  <p class="ful-help">Need help? Contact us at <a href="https://fretwellmusic.live/contact/">fretwellmusic.live/contact</a></p>
+  <p class="rc-note">Save this key. Enter it at the unlock page to access your tools on any device.</p>
+
+  <p class="rc-footer">Need help? <a href="https://fretwellmusic.live/contact/">Contact us</a></p>
 
   <script>
   document.getElementById('ful-copy').addEventListener('click', function () {
@@ -211,8 +154,8 @@ if ($from_payment) {
 
 <?php else: ?>
 
-  <div class="ful-simple">
-    <h1 class="ful-heading">Order Confirmed</h1>
+  <div class="rc-empty">
+    <h1>Order Confirmed</h1>
     <p>Thank you for your purchase.</p>
   </div>
 
