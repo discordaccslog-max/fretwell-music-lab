@@ -38,6 +38,15 @@ Keys look like `FRET-ET-7KQ4M-X9D2P-H6TR`: a product code, ten random characters
 - `node scripts/checkout-links.mjs` lists every combination with its total and the redirect address to set on the payment link (`--csv` for a spreadsheet).
 - Courses are not in the fulfillment evidence kit yet.
 
+## Cart
+
+Every product page has an "Add to cart" button (courses add the add-ons ticked at the time). The header shows a cart count, and `cart/` lists the items with their prices and totals.
+
+- The cart lives in the browser's local storage under `fretwell.cart` as `{ v: 1, items: [{ id, addons, added }] }`. Prices are not stored.
+- A checkout page should get items and prices from `cartLines()` and `cartTotal()` in `js/cart.js`, which work them out from `js/products.js`. Don't trust prices passed in from the browser.
+- Set `checkoutUrl` in `js/site-config.js` to turn on the cart's checkout button (it uses the same Terms agreement checkbox as the product pages). While it is empty, the cart says checkout isn't available yet.
+- The existing single-product buy buttons (Square links) are unchanged and still work alongside the cart.
+
 ## Project layout
 
 - `index.html`, `products/`, `about/`, `faq/`, `contact/`, policy pages, `unlock/`, `thank-you/`, `404.html` — generated pages (do not edit by hand; edit the templates)

@@ -80,6 +80,7 @@ function header(r) {
         <li><a href="${r}about/">About</a></li>
         <li><a href="${r}faq/">FAQ</a></li>
         <li class="nav-room" hidden><a href="${r}practice/">Practice room</a></li>
+        <li><a class="nav-cart" href="${r}cart/" aria-label="Cart">Cart <span class="cart-count" data-cart-count>0</span></a></li>
         <li><a class="nav-key" href="${r}unlock/">Have a key?</a></li>
       </ul>
     </nav>
@@ -477,7 +478,7 @@ function coursePage(p) {
         ${units.map((u) => `${u.name ? `<h3 class="unit-h">${esc(u.name)}</h3>` : ''}<ol class="lesson-list" start="${c.lessons.indexOf(u.lessons[0]) + 1}">${u.lessons.map(lessonItem).join('')}</ol>`).join('')}
       </section>
       <section class="p-section"><h2>Optional add-ons</h2><p>Choose add-ons in the box beside the price before you go to checkout. They are included in your license key; nothing extra is posted or emailed.</p>
-        <dl class="ex-list">${offered.map((id) => `<div><dt>${esc(ADDONS[id].name)} · ${p.addons[id]}</dt><dd>${esc(ADDONS[id].text)}${id === 'bonus' ? ` In this course: ${c.bonus.map((b) => esc(b.t)).join('; ')}.` : ''}</dd></div>`).join('')}</dl>
+        <dl class="ex-list">${offered.map((id) => `<div><dt>${esc(ADDONS[id].name)} · +$${p.addons[id]}</dt><dd>${esc(ADDONS[id].text)}${id === 'bonus' ? ` In this course: ${c.bonus.map((b) => esc(b.t)).join('; ')}.` : ''}</dd></div>`).join('')}</dl>
       </section>
       ${included}
       <section class="p-section demo-section"><h2>Try it</h2><p>A short interactive demo of ${esc(PRODUCT_BY_ID[c.primary].name)}, built from the same code the lessons use.</p><div class="demo" data-demo="${t.demo}"><noscript><p>The demo needs JavaScript turned on.</p></noscript></div></section>
@@ -512,7 +513,7 @@ function coursePage(p) {
   page({
     path: p.pagePath,
     title: `${p.name} — Course — Fretwell Music Lab`,
-    description: `${c.tagline} A ${c.lessons.length}-lesson ${c.level.toLowerCase()} course from Fretwell Music Lab, ${p.price}.`.slice(0, 300),
+    description: `${c.tagline} A ${c.lessons.length}-lesson ${c.level.toLowerCase()} course from Fretwell Music Lab, $${p.price}.`.slice(0, 300),
     body,
     scripts: ['js/pages/product.js'],
     bodyClass: 'page-product',
@@ -762,6 +763,27 @@ function faqPage() {
   });
 }
 
+function cartPage() {
+  const body = `
+<section class="text-page cart-page">
+  <div class="wrap">
+    <header class="text-head"><p class="eyebrow">Shop</p><h1 class="display-sm">Your cart</h1></header>
+    ${staffRule}
+    <p class="sr-only" role="status" aria-live="polite" data-cart-status></p>
+    <div data-cart><noscript><p>The cart needs JavaScript turned on.</p></noscript></div>
+  </div>
+</section>`;
+  page({
+    path: 'cart/',
+    title: 'Your cart — Fretwell Music Lab',
+    description: 'The tools and courses in your Fretwell Music Lab cart.',
+    body,
+    noindex: true,
+    scripts: ['js/pages/cart.js'],
+    bodyClass: 'page-text',
+  });
+}
+
 function contactPage() {
   const body = `
 <section class="text-page">
@@ -833,6 +855,7 @@ practicePage();
 textPage({ path: 'about/', title: 'About — Fretwell Music Lab', h1: 'About Fretwell Music Lab', description: 'What Fretwell Music Lab makes and why: browser-based theory and ear-training tools with generated exercises and synthesized sound.', html: ABOUT, eyebrow: 'About' });
 faqPage();
 contactPage();
+cartPage();
 textPage({ path: 'terms/', title: 'Terms of Service — Fretwell Music Lab', h1: 'Terms of Service', description: 'The terms that apply when you use the Fretwell Music Lab website and buy and use its products.', html: TERMS, dated: true, eyebrow: 'Policies', updated: UPDATED_NOV_20 });
 textPage({ path: 'privacy/', title: 'Privacy Policy — Fretwell Music Lab', h1: 'Privacy Policy', description: 'No cookies, no analytics, no trackers. Your keys, progress and settings stay in your browser. How order information is handled and your rights.', html: PRIVACY, dated: true, eyebrow: 'Policies' });
 textPage({ path: 'refunds/', title: 'Refund Policy — Fretwell Music Lab', h1: 'Refund Policy', description: 'Full refund on any Fretwell Music Lab purchase within 14 days, no reason required.', html: REFUNDS, dated: true, eyebrow: 'Policies', updated: UPDATED_NOV_20 });

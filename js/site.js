@@ -1,6 +1,7 @@
 // Fretwell Music Lab — behaviour shared by every page: theme, menu, prices, buy buttons, contact details.
 import { PRODUCT_BY_ID } from './products.js';
 import { ADDONS, ADDON_ORDER, checkoutFor, totalFor } from './addons.js';
+import { addToCart, inCart, cartCount, CART_EVENT } from './cart.js';
 import { SITE_CONFIG } from './site-config.js';
 import { hasKeys } from './core/keys.js';
 
@@ -62,8 +63,48 @@ function initPrices() {
     slot.textContent = '';
     if (!p) return;
     if (p.addons) initCourseBuy(slot, p);
-    else if (p.checkoutUrl) slot.append(...buyButton(p, () => p.checkoutUrl, `Buy now — $${p.price}`).nodes); // no checkout connected yet: no checkbox and no button at all
+    else {
+      if (p.checkoutUrl) slot.append(...buyButton(p, () => p.checkoutUrl, `Buy now — $${p.price}`).nodes); // no checkout connected yet: no checkbox and no buy button
+      slot.append(...cartButton(p, () => [], !p.checkoutUrl));
+    }
   });
+}
+
+/** "Add to cart" and its status line. getAddons() returns the course add-ons currently chosen. */
+function cartButton(p, getAddons, primary) {
+  const btn = document.createElement('button');
+  btn.type = 'button';
+  btn.className = 'btn btn-cart ' + (primary ? 'btn-ink' : 'btn-outline');
+  btn.textContent = 'Add to cart';
+  const status = document.createElement('p');
+  status.className = 'cart-status';
+  status.setAttribute('aria-live', 'polite');
+  const say = (text) => {
+    status.textContent = text + ' ';
+    const a = document.createElement('a');
+    a.href = siteRoot + 'cart/';
+    a.textContent = 'View cart';
+    status.append(a);
+  };
+  if (inCart(p.id)) say('This is in your cart.');
+  btn.addEventListener('click', () => {
+    const r = addToCart(p.id, getAddons());
+    if (!r.ok) { status.textContent = 'This browser is not letting the site save your cart (private browsing can block storage).'; return; }
+    say(r.updated ? (p.addons ? '✓ Your cart is updated with these add-ons.' : '✓ This is already in your cart.') : '✓ Added to your cart.');
+  });
+  return [btn, status];
+}
+
+/** Keep the cart count in the header up to date, including changes made in other tabs. */
+function initCartCount() {
+  const update = () => {
+    const n = cartCount();
+    document.querySelectorAll('[data-cart-count]').forEach((el) => { el.textContent = String(n); });
+    document.querySelectorAll('.nav-cart').forEach((a) => a.setAttribute('aria-label', `Cart, ${n} item${n === 1 ? '' : 's'}`));
+  };
+  window.addEventListener(CART_EVENT, update);
+  window.addEventListener('storage', (e) => { if (e.key === 'fretwell.cart') update(); });
+  update();
 }
 
 const siteRoot = new URL('../', import.meta.url).href;
@@ -164,6 +205,7 @@ function initCourseBuy(slot, p) {
     buy = buyButton(p, () => checkoutFor(p, chosen()), '');
     slot.append(...buy.nodes, missing);
   }
+  slot.append(...cartButton(p, chosen, !anyLink));
   const update = () => {
     const sum = totalFor(p, chosen());
     total.innerHTML = '';
@@ -215,5 +257,6 @@ function initYear() {
 initTheme();
 initNav();
 initPrices();
+initCartCount();
 initContact();
 initYear();
