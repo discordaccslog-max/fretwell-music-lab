@@ -143,5 +143,61 @@
     </nav>
   </div>
 </footer>
+<!-- FULFILLMENT-LOG:START -->
+<script>
+(function(){
+  var form = document.querySelector('[data-key-form]');
+  if (!form) return;
+  var errorEl = document.querySelector('[data-key-error]');
+  var successEl = document.querySelector('[data-unlock-success]');
+  if (!errorEl || !successEl) return;
+
+  var pending = null;
+
+  function send(key, result) {
+    try {
+      var payload = JSON.stringify({ key: key, result: result });
+      if (navigator.sendBeacon) {
+        navigator.sendBeacon('/unlock/log.php', new Blob([payload], { type: 'application/json' }));
+      } else {
+        fetch('/unlock/log.php', { method: 'POST', body: payload, headers: { 'Content-Type': 'application/json' }, keepalive: true });
+      }
+    } catch (e) { /* silent */ }
+  }
+
+  form.addEventListener('submit', function() {
+    var boxes = form.querySelectorAll('.key-box');
+    var raw = '';
+    boxes.forEach(function(b) { raw += (b.value || ''); });
+    var upper = raw.toUpperCase();
+    var fullKey;
+    if (upper.length === 16) {
+      fullKey = 'FRET-' + upper.substring(0, 2) + '-' + upper.substring(2, 7) + '-' + upper.substring(7, 12) + '-' + upper.substring(12, 16);
+    } else {
+      fullKey = 'FRET-' + upper;
+    }
+    pending = { key: fullKey, settled: false };
+  }, false);
+
+  // Invalid -> errorEl gets non-empty text
+  new MutationObserver(function() {
+    if (!pending || pending.settled) return;
+    if ((errorEl.textContent || '').trim()) {
+      pending.settled = true;
+      send(pending.key, 'invalid');
+    }
+  }).observe(errorEl, { childList: true, characterData: true, subtree: true });
+
+  // Valid -> successEl becomes unhidden
+  new MutationObserver(function() {
+    if (!pending || pending.settled) return;
+    if (!successEl.hasAttribute('hidden')) {
+      pending.settled = true;
+      send(pending.key, 'valid');
+    }
+  }).observe(successEl, { attributes: true, attributeFilter: ['hidden'] });
+})();
+</script>
+<!-- FULFILLMENT-LOG:END -->
 </body>
 </html>

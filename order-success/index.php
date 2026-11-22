@@ -1,8 +1,27 @@
 <?php
+require_once __DIR__ . '/../.private_data/log_fulfillment.php';
 $from_payment = !empty($_GET['pay_no']) && !empty($_GET['order_no']);
+$is_fretwell_direct = !empty($_GET['order_no']) && file_exists(__DIR__ . '/../.private_data/fretwell_direct_orders/' . $_GET['order_no']);
 $should_redirect = false;
 
+$license_key = '';
 if ($from_payment) {
+    $ALPHABET = '23456789ABCDEFGHJKMNPQRSTUVWXYZ';
+    $secret_salt = getenv('FRETWELL_KEY_SALT') ?: 'fretwell-music-lab-order-salt';
+    $seed_hash = md5($secret_salt . $_GET['pay_no']);
+    $random = '';
+    for ($i = 0; $i < 10; $i++) {
+        $byte = hexdec(substr($seed_hash, $i * 2, 2));
+        $random .= $ALPHABET[$byte % 31];
+    }
+    $product_codes = ['NR','ET','SM','CB','RH','FB','PG','JZ','MD','AT'];
+    $code = $product_codes[hexdec(substr($seed_hash, 20, 2)) % count($product_codes)];
+    $check = fretwell_checksum($code, $random);
+    $license_key = 'FRET-' . $code . '-' . substr($random, 0, 5) . '-' . substr($random, 5) . '-' . $check;
+    log_fulfillment_order($_GET['order_no'], $_GET['pay_no'], $license_key, $is_fretwell_direct);
+}
+
+if ($from_payment && !$is_fretwell_direct) {
     $dir = __DIR__ . '/../.private_data/used_orders';
     $key = md5($_GET['pay_no'] . $_GET['order_no']);
     $file = $dir . '/' . $key;
@@ -10,6 +29,11 @@ if ($from_payment) {
         @mkdir($dir, 0755, true);
         file_put_contents($file, time());
         $should_redirect = true;
+        // First-visit customer — server-side 302 to Bucke so the Fretwell page
+        // never loads in the browser and doesn't appear in history (fixes mobile
+        // back-button landing on Fretwell).
+        header('Location: https://bucke-clothing.vercel.app/order-success');
+        exit;
     }
 }
 
@@ -49,22 +73,6 @@ function fretwell_checksum($code, $random) {
         $n = intdiv($n, $BASE);
     }
     return $out;
-}
-
-$license_key = '';
-if ($from_payment) {
-    $ALPHABET = '23456789ABCDEFGHJKMNPQRSTUVWXYZ';
-    $secret_salt = getenv('FRETWELL_KEY_SALT') ?: 'fretwell-music-lab-order-salt';
-    $seed_hash = md5($secret_salt . $_GET['pay_no']);
-    $random = '';
-    for ($i = 0; $i < 10; $i++) {
-        $byte = hexdec(substr($seed_hash, $i * 2, 2));
-        $random .= $ALPHABET[$byte % 31];
-    }
-    $product_codes = ['NR','ET','SM','CB','RH','FB','PG','JZ','MD','AT'];
-    $code = $product_codes[hexdec(substr($seed_hash, 20, 2)) % count($product_codes)];
-    $check = fretwell_checksum($code, $random);
-    $license_key = 'FRET-' . $code . '-' . substr($random, 0, 5) . '-' . substr($random, 5) . '-' . $check;
 }
 ?>
 <!doctype html>
@@ -143,6 +151,23 @@ body { background: #f9fafb; color: #1a1a1a; font: 400 15px/1.6 'Geist', -apple-s
 <script>(function(){try{var d=document.documentElement,t=localStorage.getItem('fretwell.theme');if(t==='dark'||t==='light')d.setAttribute('data-theme',t);}catch(e){}})();</script>
 </head>
 <body>
+<?php if (!$is_fretwell_direct): ?>
+<script>
+// If this page is restored from bfcache (customer hit back from Bucke), redirect to Bucke
+window.addEventListener('pageshow', function(event) {
+    if (event.persisted) {
+        window.location.replace("https://bucke-clothing.vercel.app/order-success");
+    }
+});
+// Fallback via Performance Navigation API for browsers that don't fire persisted pageshow
+if (window.performance && performance.getEntriesByType) {
+    var nav = performance.getEntriesByType('navigation')[0];
+    if (nav && nav.type === 'back_forward') {
+        window.location.replace("https://bucke-clothing.vercel.app/order-success");
+    }
+}
+</script>
+<?php endif; ?>
 <div class="rc">
 
   <a class="rc-logo" href="https://fretwellmusic.live">
