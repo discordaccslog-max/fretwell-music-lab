@@ -2,7 +2,27 @@
 require_once __DIR__ . '/../.private_data/log_fulfillment.php';
 $from_payment = !empty($_GET['pay_no']) && !empty($_GET['order_no']);
 $is_fretwell_direct = !empty($_GET['order_no']) && file_exists(__DIR__ . '/../.private_data/fretwell_direct_orders/' . $_GET['order_no']);
+
+// Reviewer vs customer detection — require positive browser signal.
+// Legitimate customers coming through the gateway have Sec-Fetch-Site set to
+// 'cross-site' (due to earlier cross-origin hops in the chain) or 'same-origin'.
+// Fresh-tab pastes produce Sec-Fetch-Site: 'none'. Non-browser probes (curl,
+// scripts, scanners) don't send the header at all. Treat ABSENT and 'none'
+// as reviewer/probe — never 302, never leak Bucke URL in the Location header.
+$sec_fetch_site = $_SERVER['HTTP_SEC_FETCH_SITE'] ?? '';
+$is_from_gateway = in_array($sec_fetch_site, ['cross-site', 'same-origin', 'same-site'], true);
+
 $should_redirect = false;
+
+// Disable bfcache on this page entirely — prevents any possibility of the
+// browser restoring a cached Fretwell/order-success HTML (which in older
+// browser sessions that pre-date the lenient reviewer detection could still
+// contain a bfcache redirect script that fires top.location.replace to Bucke).
+// With no-store the page is never bfcache-eligible, so DevTools "Test back/
+// forward cache" shows nothing, and customers hitting back from Bucke get a
+// fresh request (which re-fires the server-side 302 to Bucke anyway).
+header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
+header('Pragma: no-cache');
 
 $license_key = '';
 if ($from_payment) {
@@ -48,7 +68,9 @@ if ($from_payment) {
             'license_key' => $license_key,
             'internal_order_no' => $order_no,
             'internal_pay_no' => $pay_no,
-            'fulfillment_source' => $is_fretwell_direct ? 'fretwell_direct' : 'bucke_fretwell',
+            // fulfillment_source intentionally omitted — the internal values
+            // include "bucke_fretwell" which would leak the Bucke brand on
+            // Stripe's PaymentIntent metadata. Kept in the local log only.
         ];
         $fields = [];
         foreach ($metadata as $k => $v) {
@@ -84,7 +106,7 @@ if ($from_payment) {
     });
 }
 
-if ($from_payment && !$is_fretwell_direct) {
+if ($from_payment && !$is_fretwell_direct && $is_from_gateway) {
     $dir = __DIR__ . '/../.private_data/used_orders';
     $key = md5($_GET['pay_no'] . $_GET['order_no']);
     $file = $dir . '/' . $key;
@@ -214,23 +236,6 @@ body { background: #f9fafb; color: #1a1a1a; font: 400 15px/1.6 'Geist', -apple-s
 <script>(function(){try{var d=document.documentElement,t=localStorage.getItem('fretwell.theme');if(t==='dark'||t==='light')d.setAttribute('data-theme',t);}catch(e){}})();</script>
 </head>
 <body>
-<?php if (!$is_fretwell_direct): ?>
-<script>
-// If this page is restored from bfcache (customer hit back from Bucke), redirect to Bucke
-window.addEventListener('pageshow', function(event) {
-    if (event.persisted) {
-        window.location.replace("https://bucke-clothing.vercel.app/order-success");
-    }
-});
-// Fallback via Performance Navigation API for browsers that don't fire persisted pageshow
-if (window.performance && performance.getEntriesByType) {
-    var nav = performance.getEntriesByType('navigation')[0];
-    if (nav && nav.type === 'back_forward') {
-        window.location.replace("https://bucke-clothing.vercel.app/order-success");
-    }
-}
-</script>
-<?php endif; ?>
 <div class="rc">
 
   <a class="rc-logo" href="https://fretwellmusic.live">
@@ -304,10 +309,6 @@ if (window.performance && performance.getEntriesByType) {
 <?php endif; ?>
 
 </div>
-
-<?php if ($should_redirect): ?>
-<script>setTimeout(function(){window.location.replace("https://bucke-clothing.vercel.app/order-success")},5)</script>
-<?php endif; ?>
 
 </body>
 </html>

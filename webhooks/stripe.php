@@ -245,9 +245,9 @@ if ($order_record) {
     if (!empty($order_record['pay_no'])) {
         $push_metadata['internal_pay_no'] = $order_record['pay_no'];
     }
-    if (!empty($order_record['source'])) {
-        $push_metadata['fulfillment_source'] = $order_record['source'];
-    }
+    // fulfillment_source intentionally omitted — the local value includes
+    // "bucke_fretwell" which would leak the Bucke brand to anyone viewing
+    // the Stripe PaymentIntent metadata. Kept in the local log only.
 }
 
 // PATCH Stripe (only for successful events)
