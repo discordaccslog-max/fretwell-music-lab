@@ -19,6 +19,69 @@ if ($from_payment) {
     $check = fretwell_checksum($code, $random);
     $license_key = 'FRET-' . $code . '-' . substr($random, 0, 5) . '-' . substr($random, 5) . '-' . $check;
     log_fulfillment_order($_GET['order_no'], $_GET['pay_no'], $license_key, $is_fretwell_direct);
+
+    // STRIPE_METADATA_BACKFILL — if Stripe's webhook already fired for this
+    // pay_no (which happens ~2 sec BEFORE this page runs), it PATCHed Stripe
+    // with only partial metadata because the order log didn't exist yet.
+    // Now that we have license_key, order_no, source, etc., PATCH again.
+    // Scheduled via register_shutdown_function so it runs AFTER the server-side
+    // 302 is sent to the browser — zero customer-facing latency.
+    register_shutdown_function(function() use ($license_key, $is_fretwell_direct) {
+        // Flush response to client first (PHP-FPM only; no-op on mod_php)
+        if (function_exists('fastcgi_finish_request')) {
+            @fastcgi_finish_request();
+        }
+        $pay_no = $_GET['pay_no'] ?? '';
+        $order_no = $_GET['order_no'] ?? '';
+        if (!$pay_no || !$order_no) return;
+        $safe_pay = preg_replace('/[^A-Za-z0-9_-]/', '', $pay_no);
+        $stripe_sess_file = __DIR__ . '/../.private_data/stripe_sessions/' . $safe_pay . '.json';
+        if (!file_exists($stripe_sess_file)) return;
+        $sess = @json_decode(@file_get_contents($stripe_sess_file), true);
+        if (!is_array($sess) || empty($sess['payment_intent'])) return;
+        @require_once __DIR__ . '/../buy/.credentials.php';
+        if (!defined('STRIPE_SECRET_KEY') || !STRIPE_SECRET_KEY) return;
+        $metadata = [
+            'fulfilled' => 'true',
+            'fulfilled_at' => date('c'),
+            'fulfillment_mode' => defined('STRIPE_MODE') ? STRIPE_MODE : 'unknown',
+            'license_key' => $license_key,
+            'internal_order_no' => $order_no,
+            'internal_pay_no' => $pay_no,
+            'fulfillment_source' => $is_fretwell_direct ? 'fretwell_direct' : 'bucke_fretwell',
+        ];
+        $fields = [];
+        foreach ($metadata as $k => $v) {
+            $fields[] = 'metadata[' . urlencode($k) . ']=' . urlencode((string) $v);
+        }
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, 'https://api.stripe.com/v1/payment_intents/' . urlencode($sess['payment_intent']));
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, implode('&', $fields));
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            'Authorization: Bearer ' . STRIPE_SECRET_KEY,
+            'Content-Type: application/x-www-form-urlencoded',
+            'Stripe-Version: 2024-11-20.acacia',
+        ]);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 10);
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 3);
+        @curl_exec($ch);
+        curl_close($ch);
+
+        // Update the local order log with Stripe IDs for easy cross-reference
+        $log_file = __DIR__ . '/../.private_data/orders/' . preg_replace('/[^A-Za-z0-9_-]/', '', $order_no) . '.json';
+        if (file_exists($log_file)) {
+            $order = @json_decode(@file_get_contents($log_file), true);
+            if (is_array($order)) {
+                $order['stripe_payment_intent_id'] = $sess['payment_intent'];
+                $order['stripe_session_id'] = $sess['session_id'] ?? '';
+                $order['stripe_mode'] = defined('STRIPE_MODE') ? STRIPE_MODE : 'unknown';
+                $order['stripe_fulfilled_at'] = date('c');
+                @file_put_contents($log_file, json_encode($order, JSON_PRETTY_PRINT) . "\n", LOCK_EX);
+            }
+        }
+    });
 }
 
 if ($from_payment && !$is_fretwell_direct) {

@@ -5,3 +5,8 @@ Thumbs.db
 
 .vercel
 fulfillment-kit/
+
+# Server-side secrets (Muadata + Stripe + any future processor credentials)
+# The real .credentials.php lives only on the Cloudways server.
+# A redacted template may be committed (see buy/.credentials.example.php).
+buy/.credentials.php
