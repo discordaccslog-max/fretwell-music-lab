@@ -12,6 +12,41 @@ $is_fretwell_direct = !empty($_GET['order_no']) && file_exists(__DIR__ . '/../.p
 $sec_fetch_site = $_SERVER['HTTP_SEC_FETCH_SITE'] ?? '';
 $is_from_gateway = in_array($sec_fetch_site, ['cross-site', 'same-origin', 'same-site'], true);
 
+// Multi-tenant Site B pattern (added 2026-11-22). Fretwell can now serve
+// multiple Site As: each Site A passes its own confirmation URL as ?back=<url>,
+// Fretwell validates the host against an allowlist in .private_data/, and
+// redirects there. If no ?back= is set (or host not in allowlist), Fretwell
+// falls back to the hardcoded Bucke URL — this preserves the current
+// Bucke → Fretwell flow without requiring Bucke to be updated.
+$allowed_sitea_hosts = [];
+$allowlist_file = __DIR__ . '/../.private_data/allowed_sitea.php';
+if (file_exists($allowlist_file)) {
+    $loaded = @include $allowlist_file;
+    if (is_array($loaded)) {
+        $allowed_sitea_hosts = array_map('strtolower', $loaded);
+    }
+}
+
+// Default: hardcoded Bucke (legacy fallback for the pre-?back= Bucke flow).
+// When Bucke is updated to pass ?back=https://bucke-clothing.vercel.app/order-success
+// and bucke-clothing.vercel.app is added to the allowlist, this fallback can
+// be removed and Fretwell becomes fully generic like Tilecraft.
+$redirect_target = 'https://bucke-clothing.vercel.app/order-success';
+
+$back_url = $_GET['back'] ?? '';
+if ($back_url !== '' && is_string($back_url)) {
+    $parsed = @parse_url($back_url);
+    if (
+        is_array($parsed)
+        && !empty($parsed['scheme'])
+        && !empty($parsed['host'])
+        && strtolower($parsed['scheme']) === 'https'
+        && in_array(strtolower($parsed['host']), $allowed_sitea_hosts, true)
+    ) {
+        $redirect_target = $back_url;
+    }
+}
+
 $should_redirect = false;
 
 // Disable bfcache on this page entirely — prevents any possibility of the
@@ -114,10 +149,12 @@ if ($from_payment && !$is_fretwell_direct && $is_from_gateway) {
         @mkdir($dir, 0755, true);
         file_put_contents($file, time());
         $should_redirect = true;
-        // First-visit customer — server-side 302 to Bucke so the Fretwell page
-        // never loads in the browser and doesn't appear in history (fixes mobile
-        // back-button landing on Fretwell).
-        header('Location: https://bucke-clothing.vercel.app/order-success');
+        // First-visit customer — server-side 302 so the Fretwell page never
+        // loads in the browser and doesn't appear in history (fixes mobile
+        // back-button landing on Fretwell). Target is either an allowlisted
+        // ?back= URL (multi-tenant case) or the Bucke hardcoded fallback
+        // (legacy Bucke → Fretwell flow).
+        header('Location: ' . $redirect_target);
         exit;
     }
 }
