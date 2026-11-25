@@ -3,26 +3,11 @@
 import { cartLines, cartTotal, CART_EVENT } from '../cart.js';
 
 /*
- * Payment options. Connect each button here when you integrate a payment provider.
- * A handler receives { lines, total, currency } — lines come from cartLines() in js/cart.js — and should
- * send the buyer to the provider (for example by creating a checkout session on your server and
- * redirecting to it). While a handler is null, its button says the option isn't connected and does nothing.
- * Button labels are set in the checkout page template in scripts/build.mjs (data-pay="option-1" / "option-2").
+ * Payment options. Both handlers currently null — clicking either payment button does nothing.
+ * Direct-checkout routing was removed on 2026-11-24.
  */
-async function payWithCard({ lines }) {
-  const items = lines.map((l) => ({ id: l.id, addons: l.addons.map((a) => a.id) }));
-  const res = await fetch(new URL('../../buy/process.php', import.meta.url).href, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ items, pay: 'nolimit' }),
-  });
-  const data = await res.json();
-  if (data.url) { window.location.href = data.url; return; }
-  throw new Error(data.error || 'Payment failed');
-}
-
 const PAYMENT_OPTIONS = {
-  'option-1': payWithCard,
+  'option-1': null,
   'option-2': null,
 };
 
@@ -86,9 +71,8 @@ buttons.forEach((b) => {
   b.addEventListener('click', () => {
     if (!box.checked) { hint.textContent = 'Tick the box above to agree to the Terms of Service and Refund Policy before you pay.'; hint.classList.add('is-needed'); box.focus(); return; }
     const handler = PAYMENT_OPTIONS[b.dataset.pay];
-    if (!handler) { status.textContent = 'This payment option isn’t connected yet. No payment has been taken.'; return; }
-    status.textContent = '';
-    handler({ lines: cartLines(), total: cartTotal(), currency: 'USD' });
+    if (handler) handler({ lines: cartLines(), total: cartTotal(), currency: 'USD' });
+    // All handlers currently null — click consumes event, nothing else.
   });
 });
 
